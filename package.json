@@ -1,0 +1,47 @@
+{
+  "name": "cmn-utils",
+  "version": "0.0.4",
+  "description": "common func & req",
+  "keywords": [
+    "react",
+    "util"
+  ],
+  "files": [
+    "lib",
+    "es"
+  ],
+  "main": "./lib",
+  "repository": "https://github.com/LANIF-UI/cmn-utils.git",
+  "license": "MIT",
+  "config": {
+    "port": 8000
+  },
+  "scripts": {
+    "build": "rc-tools run build",
+    "compile": "rc-tools run compile",
+    "pub": "rc-tools run pub --babel-runtime",
+    "lint": "rc-tools run lint",
+    "test": "jest",
+    "coverage": "jest --coverage"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/*"
+    ],
+    "transform": {
+      "\\.tsx?$": "./node_modules/rc-tools/scripts/jestPreprocessor.js",
+      "\\.jsx?$": "./node_modules/rc-tools/scripts/jestPreprocessor.js"
+    }
+  },
+  "pre-commit": [
+    "lint"
+  ],
+  "devDependencies": {
+    "jest": "^22.0.3",
+    "rc-tools": "^7.0.6",
+    "pre-commit": "1.x"
+  },
+  "dependencies": {
+    "whatwg-fetch": "^2.0.3"
+  }
+}
