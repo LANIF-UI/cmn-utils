@@ -140,12 +140,13 @@ export default class Request {
 
     // if FormData
     if (contentType.indexOf('multipart/form-data') !== -1) {
+      if (!(this._body instanceof FormData)) {
+        this._body = new FormData();
+      }
+      
       if (data instanceof FormData) {
         this._body = data;
         return this;
-      }
-      if (!(this._body instanceof FormData)) {
-        this._body = new FormData();
       }
 
       if (typeof data === 'object') {
