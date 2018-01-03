@@ -206,10 +206,10 @@ export default class Request {
 
     if (afterResponse) {
       return fetch(url, fetchOpts).then(res => {
-        return resolve(afterResponse(res)).then(() => res.clone())
+        return resolve(afterResponse(res))
       })
     }
-    
+
     return fetch(prefix + url, fetchOpts).then((response) => {
       if (response.status >= 200 && response.status < 300) {
         if (response.status == 204) {
@@ -221,7 +221,9 @@ export default class Request {
       var err = new Error(response.statusText)
       err.response = response
       reject(err);
-    }).catch(e => reject(e))
+    }).catch(e => {
+      reject(e)
+    })
   })
 }
 
