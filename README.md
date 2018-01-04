@@ -43,8 +43,10 @@ request.delete('/put/1')
 
 ### 基本使用
 
+#### 简化写法
+
 ```javascript
-// fetch 写法
+// 原始fetch 写法
 fetch('http://httpbin.org/post', {
   method: 'POST',
   headers: {
@@ -81,6 +83,8 @@ request
   })
 ```
 
+#### 提交form表单
+
 ```js
 // 提交form表单
 request
@@ -90,6 +94,8 @@ request
     console.log(resp.json) // {name: 'weiq'}
   })
 ```
+
+#### 全局配置, 将会覆盖默认参数, 一般全局配置一次
 
 ```js
 // 全局配置, 将会覆盖默认参数, 一般全局配置一次
@@ -103,4 +109,28 @@ request
 request
   .headers('Accept', 'application/json')  // key-value
   .headers({ Accept: 'application/json' }) // json
+```
+
+#### 临时改变配置项
+
+```js
+request
+  .post('http://httpbin.org/post', {name: 'weiq'}, {
+    headers: {
+      'content-type': 'application/json'
+    },
+    responseType: 'json',
+  })
+  .then(resp => {
+    console.log(resp.json) // {name: 'weiq'}
+  })
+// 或
+request
+  .temp() // 将会生成一个新 request 实例完成操作
+  .headers({ mode: 'cors' })
+  .contentType('json')
+  .post('http://httpbin.org/post', {name: 'weiq'})
+  .then(resp => {
+    console.log(resp.json) // {name: 'weiq'}
+  })
 ```

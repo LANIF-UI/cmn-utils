@@ -1,3 +1,4 @@
+import L from '../index';
 export const REQUEST_METHODS = [
   'GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PUT', 'PATCH'
 ];
@@ -42,6 +43,10 @@ export default class Request {
         return this.send(url, {...opts, method})
       }
     })
+  }
+
+  temp = (opts) => {
+    return new Request(opts);
   }
 
   /**
@@ -112,7 +117,6 @@ export default class Request {
     case 'urlencoded':
       type = 'application/x-www-form-urlencoded;charset=UTF-8'
       break;
-    case 'formData' :
     case 'multipart':
       type = 'multipart/form-data'
       break;
@@ -122,49 +126,60 @@ export default class Request {
     return this;
   }
 
-  /**
-   * Send data
-   *
-   * Examples:
-   *   .data({ name: 'hello' })
-   *
-   * @param {Object} data
-   * @return {Request}
-   */
-  data(data, exclusive) {
-    let contentType = this._options.headers['content-type'];
-
-    if (exclusive) {
-      this._body = null;
-    }
+  _data(data, contentType) {
+    let body = null;
 
     // if FormData
     if (contentType.indexOf('multipart/form-data') !== -1) {
-      if (!(this._body instanceof FormData)) {
-        this._body = new FormData();
-      }
+      body = new FormData();
       
       if (data instanceof FormData) {
-        this._body = data;
-        return this;
+        body = data;
+        return body;
       }
 
       if (typeof data === 'object') {
         for (let k in data) {
-          this._body.append(k, data[k])
+          body.append(k, data[k])
         }
       }
     } else {
-      if (this._body && typeof data === 'object') {
+      if (body && typeof data === 'object') {
         for (let key in data) {
-          this._body[key] = data[key]
+          body[key] = data[key]
         }
       } else {
-        this._body = data
+        body = data
       }
     }
 
-    return this
+    return body;
+  }
+
+  /**
+   * GET send form
+   */
+  getform = (url, opts = {}) => {
+    return this.send(url, {
+      ...opts, 
+      method: 'GET',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      }
+    })
+  }
+
+  /**
+   * POST send form
+   */
+  postform = (url, opts = {}) => {
+    return this.send(url, {
+      ...opts, 
+      method: 'POST',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      }
+    })
   }
 
   // send request
@@ -181,22 +196,22 @@ export default class Request {
 
     const contentType = fetchOpts.headers['content-type'];
 
-    this.data(data, true);
+    const body = this._data(data, contentType);
 
     if (contentType.indexOf('application/json') !== -1) {
-      fetchOpts.body = JSON.stringify(this._body);
+      fetchOpts.body = JSON.stringify(body);
     } else if (contentType.indexOf('application/x-www-form-urlencoded') !== -1) {
-      fetchOpts.body = param(this._body);
+      fetchOpts.body = param(body);
     } else {
-      fetchOpts.body = this._body;
+      fetchOpts.body = body;
     }
     
     // if 'GET' request, join _body of url queryString
-    if (fetchOpts.method.toUpperCase() === 'GET' && this._body) {
+    if (fetchOpts.method.toUpperCase() === 'GET' && body) {
       if (url.indexOf('?') >= 0) {
-        url += '&' + param(this._body)
+        url += '&' + param(body)
       } else {
-        url += '?' + param(this._body)
+        url += '?' + param(body)
       }
       delete fetchOpts.body;
     }
