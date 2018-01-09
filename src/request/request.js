@@ -1,4 +1,3 @@
-import L from '../index';
 export const REQUEST_METHODS = [
   'GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PUT', 'PATCH'
 ];
@@ -45,7 +44,7 @@ export default class Request {
     })
   }
 
-  temp = (opts) => {
+  create = (opts) => {
     return new Request(opts);
   }
 

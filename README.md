@@ -126,7 +126,7 @@ request
   })
 // 或
 request
-  .temp() // 将会生成一个新 request 实例完成操作
+  .create() // 将会生成一个新 request 实例完成操作
   .headers({ mode: 'cors' })
   .contentType('json')
   .post('http://httpbin.org/post', {name: 'weiq'})
