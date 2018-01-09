@@ -14,7 +14,12 @@
   "repository": "https://github.com/LANIF-UI/cmn-utils.git",
   "license": "MIT",
   "config": {
-    "port": 8000
+    "port": 8000,
+    "entry": {
+      "cmn-utils": [
+        "./src/index.js"
+      ]
+    }
   },
   "scripts": {
     "start": "rc-tools run server",

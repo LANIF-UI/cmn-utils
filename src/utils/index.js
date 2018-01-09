@@ -46,5 +46,6 @@ export function isObject(val) {
   return val && {}.toString.call(val) === '[object Object]'
 }
 
-export function async(func) {
+export function asyncFunc(func) {
+  return () => new Promise((resolve, reject) => resolve(isFunction(func) ? resolve(func(arguments)) : reject(new TypeError(func + 'is not function'))));
 }

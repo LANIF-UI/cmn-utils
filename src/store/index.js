@@ -2,7 +2,11 @@ import store from 'store/dist/store.modern';
 import {isObject} from '../utils';
 
 /**
- * 将数据存储在本地缓存中指定的 key 中，会覆盖掉原来该 key 对应的内容，这是一个异步接口
+ * 将 value 存储在本地缓存中指定的 key 中，会覆盖掉原来该 key 对应的内容
+ * Examples:
+ *
+ *   .setStore('name', 'abc')
+ *   .setStore({ name: 'abc', age: 18 }) // 一次存多个
  * @param {string | object} key 
  * @param {any} value 
  */
@@ -14,73 +18,49 @@ export function setStore(key, value) {
   } else {
     store.set(key, value);
   }
-}
-
-/**
- * 将 value 存储在本地缓存中指定的 key 中，会覆盖掉原来该 key 对应的内容，这是一个同步接口
- * @param {string | object} key 
- * @param {any} value 
- */
-export function setStoreSync(key, value) {
-
+  return this;
 }
 
 /**
  * 从本地缓存中异步获取指定 key 对应的内容
  * @param {string} key 
+ * @return {Promise}
  */
-export function getStore(key) {
-
+export function getStoreAsync(key) {
+  return Promise.resolve(store.get(key));
 }
 
 /**
  * 从本地缓存中同步获取指定 key 对应的内容
  * @param {string} key 
  */
-export function getStoreSync(key) {
-
+export function getStore(key) {
+  return store.get(key)
 }
 
 /**
- * 异步获取当前Store的所有key-value信息
+ * 获取当前Store的所有key-value信息
  */
 export function getStoreInfo() {
-
+  let db = [];
+  store.each(function(value, key) {
+    db.push({[key]: value})
+  })
+  return db;
 }
 
 /**
- * 同步获取当前Store的所有key-value信息
- */
-export function getStoreInfoSync() {
-
-}
-
-/**
- * 从本地缓存中异步移除指定 key 
+ * 从本地缓存中移除指定 key 
  * @param {string} key 
  */
 export function removeStore(key) {
-
-}
-
-/**
- * 从本地缓存中同步移除指定 key 
- * @param {string} key 
- */
-export function removeStoreSync(key) {
-
+  store.remove(key)
+  return this;
 }
 
 /**
  * 清理本地数据缓存
  */
 export function clearStore() {
-
-}
-
-/**
- * 同步清理本地数据缓存
- */
-export function clearStoreSync() {
-
+  store.clearAll();
 }
