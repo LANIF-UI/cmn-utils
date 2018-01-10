@@ -4,11 +4,11 @@ React中可复用的通用模块
 
 # 目录
 
-* [Request(请求)](#request)
-* [Store(存储)](#installation)
-* [UI(交互)](#compatibility)
+* [Request](#request)
+* [Store](#installation)
+* [UI](#compatibility)
 
-# Request(请求)
+# Request
 
 简单包装的Fetch
 
