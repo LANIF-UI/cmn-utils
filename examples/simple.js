@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import L from '../src/index';
+import L, {setStore} from '../src/index';
 
 const A = () => {
   function set() {

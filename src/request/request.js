@@ -1,3 +1,5 @@
+import {isFunction, isObject} from '../utils';
+
 export const REQUEST_METHODS = [
   'GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PUT', 'PATCH'
 ];
@@ -60,7 +62,7 @@ export default class Request {
    * @param {Any} value
    * @return {Request}
    */
-  config(key, value) {
+  config = (key, value) => {
     const options = this._options
 
     if (typeof key === 'object') {
@@ -71,6 +73,27 @@ export default class Request {
       options[key] = value
     }
 
+    return this;
+  }
+
+  prefix = (prefix) => {
+    if (prefix && typeof prefix === 'string') this._options.prefix = prefix;
+    return this;
+  }
+
+  beforeRequest = (cb) => {
+    const options = this._options
+    if (cb && typeof cb === 'function') {
+      options.beforeRequest = cb
+    }
+    return this;
+  }
+
+  afterResponse = (cb) => {
+    const options = this._options
+    if (cb && typeof cb === 'function') {
+      options.afterResponse = cb
+    }
     return this;
   }
 
@@ -86,14 +109,16 @@ export default class Request {
    * @param {String} value
    * @return {Request}
    */
-  headers(key, value) {
+  headers = (key, value) => {
     const {headers} = this._options;
 
-    if (typeof key === 'object') {
+    if (isObject(key)) {
       for (let k in key) {
         headers[k.toLowerCase()] = key[k]
       }
-    } else {
+    } else if (isFunction(key)) {
+      headers.__headersFun__ = key;
+    }else {
       headers[key.toLowerCase()] = value
     }
 
@@ -105,7 +130,7 @@ export default class Request {
    *
    * @param {String} type
    */
-  contentType(type) {
+  contentType = (type) => {
     const {headers} = this._options;
 
     switch (type) {
@@ -125,7 +150,7 @@ export default class Request {
     return this;
   }
 
-  _data(data, contentType) {
+  _data = (data, contentType) => {
     let body = null;
 
     // if FormData
@@ -191,9 +216,18 @@ export default class Request {
 
     const options = {...this._options, ...otherOpts};
 
-    const { beforeRequest, afterResponse, responseType, prefix, ...fetchOpts } = options;
+    const { beforeRequest, afterResponse, responseType, prefix, headers, ...fetchOpts } = options;
 
-    const contentType = fetchOpts.headers['content-type'];
+    const {__headersFun__, ...realheaders} = headers;
+    let newheaders = {...realheaders};
+    if (__headersFun__) {
+      const _newheaders = __headersFun__();
+      if (_newheaders && isObject(_newheaders)) {
+        newheaders = {...realheaders, ..._newheaders}
+      }
+    }
+
+    const contentType = newheaders['content-type'];
 
     const body = this._data(data, contentType);
 
@@ -219,24 +253,35 @@ export default class Request {
       return reject(new Error('request canceled by beforeRequest'))
     }
 
-    if (afterResponse) {
-      return fetch(url, fetchOpts).then(res => {
-        return resolve(afterResponse(res))
-      })
-    }
-
-    return fetch(prefix + url, fetchOpts).then((response) => {
+    const promise = fetch(prefix + url, {headers: newheaders, ...fetchOpts}).then((response) => {
       if (response.status >= 200 && response.status < 300) {
         if (response.status == 204) {
-          return resolve(null);
+          return null;
         }
 
-        return typeof response[responseType] === 'function' ? resolve(response[responseType]()) : resolve(response);
+        return typeof response[responseType] === 'function' ? response[responseType]() : response;
       }
       var err = new Error(response.statusText)
       err.response = response
       reject(err);
-    }).catch(e => {
+    });
+
+    if (isFunction(afterResponse)) {
+      return promise.then(response => {
+        const after = afterResponse(response);
+        if (after && after.then) {
+          after.then(afterResp => {
+            resolve(afterResp);
+          })
+        } else{
+          resolve(after);
+        }
+      }).catch(e => {
+        reject(e)
+      })
+    }
+
+    return promise.then(response => resolve(response)).catch(e => {
       reject(e)
     })
   })

@@ -8,7 +8,10 @@ if (typeof window.fetch === 'undefined') {
 const request = new Request();
 
 const create = request.create;
-const config = request.config;
+const requestConfig = request.config;
+const prefix = request.prefix;
+const beforeRequest = request.beforeRequest;
+const afterResponse = request.afterResponse;
 const headers = request.headers;
 const contentType = request.contentType;
 const getform = request.getform;
@@ -21,6 +24,7 @@ const del = request.delete;
 const put = request.put;
 
 export {
-  create, config, headers, contentType, getform, postform, send,
-  get, post, head, del, put
+  request, create, requestConfig, prefix, beforeRequest, 
+  afterResponse, headers, contentType, getform, postform, 
+  send, get, post, head, del, put
 };
