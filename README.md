@@ -12,6 +12,18 @@ React中可复用的通用模块
 
 简单包装的Fetch
 
+## API
+- request request对象
+- create  创建一个新的request对象
+- requestConfig 配置所有默认选项
+- headers 设置headers, 支持 object | key-value | function 类型参数
+- contentType 设置content-type
+- prefix 配置请求前缀
+- beforeRequest 请求前的hook
+- afterResponse 请求后的hook
+- send 发送请求
+- getform, postform, get, post, head, del, put 发送请求(简化的send)
+
 ## 使用
 
 ```javascript
