@@ -1,6 +1,6 @@
 {
   "name": "cmn-utils",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "common func & req",
   "keywords": [
     "react",
@@ -14,12 +14,7 @@
   "repository": "https://github.com/LANIF-UI/cmn-utils.git",
   "license": "MIT",
   "config": {
-    "port": 8000,
-    "entry": {
-      "cmn-utils": [
-        "./src/index.js"
-      ]
-    }
+    "port": 8000
   },
   "scripts": {
     "start": "rc-tools run server",
