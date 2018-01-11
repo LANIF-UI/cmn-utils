@@ -50,7 +50,7 @@
     "react-dom": "^16.2.0"
   },
   "dependencies": {
-    "store": "^2.0.12",
+    "store2": "^2.5.9",
     "whatwg-fetch": "^2.0.3"
   }
 }

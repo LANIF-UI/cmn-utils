@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import L, {setStore} from '../src/index';
+import $$, {store} from '../src/index';
 
 const A = () => {
   function set() {
-    L .setStore("name", "abc")
+    $$.setStore("name", "abc")
       .setStore("multi", {ip: '0.0.0.0'})
       .setStore("age", 18)
       .setStore({
@@ -16,17 +16,21 @@ const A = () => {
   }
 
   function get() {
-    const multi = L.getStore("multi");
+    const multi = $$.getStore("multi");
     console.log(multi)
   }
 
   function getAsync() {
-    const name = L.getStoreAsync("name").then(value => console.log("异步值：", value));
+    const name = store.getStoreAsync("name").then(value => console.log("异步值：", value));
   }
 
   function getStore() {
-    const store = L.getStoreInfo();
-    console.log(store);
+    const all = store.getStoreInfo();
+    console.log(all);
+
+    store
+      .getStoreInfoAsync(value => console.log('async', value))
+      .setStore('name', 'def');
   }
 
   return (
@@ -38,8 +42,8 @@ const A = () => {
       <br />
       <button onClick={getStore}>获取全部store</button>
       <br />
-      <button onClick={e => L.removeStore('name')}>删除</button>
-      <button onClick={e => L.clearStore()}>清空</button>
+      <button onClick={e => $$.removeStore('name')}>删除</button>
+      <button onClick={e => $$.clearStore()}>清空</button>
     </div>
   )
 }
