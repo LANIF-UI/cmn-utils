@@ -1,4 +1,8 @@
-# common-api
+# cmn-utils
+
+[![NPM version](https://img.shields.io/npm/v/cmn-utils.svg?style=flat)](https://npmjs.org/package/cmn-utils)
+[![NPM downloads](http://img.shields.io/npm/dm/cmn-utils.svg?style=flat)](https://npmjs.org/package/cmn-utils)
+[![Dependencies](https://david-dm.org/sorrycc/cmn-utils/status.svg)](https://david-dm.org/sorrycc/cmn-utils)
 
 React中可复用的通用模块, 一些不常用的函数，或在全局函数里会引起奇异的函数没有引出到全局，可以使用$$.request | $$.store 等间接使用，或`import { request } from 'cmn-utils'`，也可以直接使用 `import request from 'cmn-utils/lib/request'`
 
