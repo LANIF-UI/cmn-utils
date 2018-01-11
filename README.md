@@ -18,7 +18,7 @@ React中可复用的通用模块, 一些不常用的函数，或在全局函数�
 - requestHeaders 设置headers, 支持 object | key-value | function 类型参数
 - send 发送请求
 - getform, postform, get, post, head, del, put 发送请求(这些都是简化的send)
-下面为不在$$中的方法
+- *下面为不在$$中的方法*
 - create 返回新实例
 - config 同 requestConfig
 - headers 同 requestHeaders
@@ -149,7 +149,7 @@ $$.post('http://httpbin.org/post', {name: 'weiq'}, {
 - getStore 
 - removeStore 
 - clearStore
-下面为不在$$中的方法
+- *下面为不在$$中的方法*
 - getStoreAsync
 - create
 - getStoreInfo
