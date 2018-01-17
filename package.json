@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "store2": "^2.5.9",
-    "whatwg-fetch": "^2.0.3"
+    "whatwg-fetch": "^2.0.3",
+    "wolfy87-eventemitter": "^5.2.4"
   }
 }

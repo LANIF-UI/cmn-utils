@@ -1,5 +1,6 @@
 import request from './request';
 import store from './store';
+import event, { on, once, off, trigger } from './event';
 
 /**
  * 导出常用请求函数到全局，其它高级配置使用 '.request.xxx()' 
@@ -30,13 +31,15 @@ const clearStore     = store.clearStore;
 export { store };
 
 /**
- * 全局
+ * default export
  */
 const L = {
   // request api
   request, requestConfig, requestHeaders, getform, postform, send, get, post, head, del, put,
   // store api
   store, setStore, getStore, removeStore, clearStore,
+  // event api
+  event, on, once, off, trigger,
   // common utils
   ...require('./utils'),
 }
