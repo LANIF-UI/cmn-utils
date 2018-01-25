@@ -1,4 +1,5 @@
 import {isFunction, isObject} from '../utils';
+import {checkStatus} from './code';
 
 export const REQUEST_METHODS = [
   'GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PUT', 'PATCH'
@@ -261,8 +262,7 @@ export default class Request {
 
         return typeof response[responseType] === 'function' ? response[responseType]() : response;
       }
-      var err = new Error(response.statusText)
-      err.response = response
+      var err = checkStatus(response);
       reject(err);
     });
 
