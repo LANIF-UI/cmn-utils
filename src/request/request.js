@@ -1,5 +1,4 @@
 import {isFunction, isObject} from '../utils';
-import {checkStatus} from './code';
 
 export const REQUEST_METHODS = [
   'GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PUT', 'PATCH'
@@ -262,8 +261,13 @@ export default class Request {
 
         return typeof response[responseType] === 'function' ? response[responseType]() : response;
       }
-      var err = checkStatus(response);
-      reject(err);
+      const errortext = response.statusText;
+    
+      const error = new Error(errortext);
+      error.code = response.status;
+      error.response = response;
+
+      return reject(error);
     });
 
     if (isFunction(afterResponse)) {
@@ -281,9 +285,7 @@ export default class Request {
       })
     }
 
-    return promise.then(response => resolve(response)).catch(e => {
-      reject(e)
-    })
+    return promise.then(response => resolve(response));
   })
 }
 

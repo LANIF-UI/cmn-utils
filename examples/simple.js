@@ -33,6 +33,12 @@ const A = () => {
       .setStore('name', 'def');
   }
 
+  function get() {
+    $$.get('http://httpbin.org/post')
+      .then(resp => console.log(resp))
+      .catch(e => console.log(e))
+  }
+
   return (
     <div style={{ marginBottom: 400 }}>
       <h1>Store:</h1>
@@ -44,6 +50,8 @@ const A = () => {
       <br />
       <button onClick={e => $$.removeStore('name')}>删除</button>
       <button onClick={e => $$.clearStore()}>清空</button>
+      <h1>Request</h1>
+      <button onClick={get}>get</button>
     </div>
   )
 }
