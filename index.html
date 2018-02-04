@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css" rel="stylesheet"/>
+  <title>cmn-utils@0.1.2 - common func &amp; req</title>
+  <style>
+    @font-face {
+      font-family: octicons-anchor;
+      src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
+    }
+
+    .markdown-body, .examples, #readme {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      color: #333;
+      overflow: hidden;
+      font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      word-wrap: break-word;
+    }
+
+    .markdown-body a, .examples a {
+      background-color: transparent;
+    }
+
+    .markdown-body a:active,
+    .markdown-body a:hover {
+      outline: 0;
+    }
+
+    .markdown-body strong {
+      font-weight: bold;
+    }
+
+    .markdown-body h1 {
+      font-size: 2em;
+      margin: 0.67em 0;
+    }
+
+    .markdown-body img {
+      border: 0;
+    }
+
+    .markdown-body hr {
+      box-sizing: content-box;
+      height: 0;
+    }
+
+    .markdown-body pre {
+      overflow: auto;
+    }
+
+    .markdown-body code,
+    .markdown-body kbd,
+    .markdown-body pre {
+      font-family: monospace, monospace;
+      font-size: 1em;
+    }
+
+    .markdown-body input {
+      color: inherit;
+      font: inherit;
+      margin: 0;
+    }
+
+    .markdown-body html input[disabled] {
+      cursor: default;
+    }
+
+    .markdown-body input {
+      line-height: normal;
+    }
+
+    .markdown-body input[type="checkbox"] {
+      box-sizing: border-box;
+      padding: 0;
+    }
+
+    .markdown-body table {
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    .markdown-body td,
+    .markdown-body th {
+      padding: 0;
+    }
+
+    .markdown-body * {
+      box-sizing: border-box;
+    }
+
+    .markdown-body input {
+      font: 13px/1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+    }
+
+    .markdown-body a {
+      color: #4078c0;
+      text-decoration: none;
+    }
+
+    .markdown-body a:hover,
+    .markdown-body a:active {
+      text-decoration: underline;
+    }
+
+    .markdown-body hr {
+      height: 0;
+      margin: 15px 0;
+      overflow: hidden;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .markdown-body hr:before {
+      display: table;
+      content: "";
+    }
+
+    .markdown-body hr:after {
+      display: table;
+      clear: both;
+      content: "";
+    }
+
+    .markdown-body h1,
+    .markdown-body h2,
+    .markdown-body h3,
+    .markdown-body h4,
+    .markdown-body h5,
+    .markdown-body h6 {
+      margin-top: 15px;
+      margin-bottom: 15px;
+      line-height: 1.1;
+    }
+
+    .markdown-body h1 {
+      font-size: 30px;
+    }
+
+    .markdown-body h2 {
+      font-size: 21px;
+    }
+
+    .markdown-body h3 {
+      font-size: 16px;
+    }
+
+    .markdown-body h4 {
+      font-size: 14px;
+    }
+
+    .markdown-body h5 {
+      font-size: 12px;
+    }
+
+    .markdown-body h6 {
+      font-size: 11px;
+    }
+
+    .markdown-body blockquote {
+      margin: 0;
+    }
+
+    .markdown-body ul,
+    .markdown-body ol {
+      padding: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .markdown-body ol ol,
+    .markdown-body ul ol {
+      list-style-type: lower-roman;
+    }
+
+    .markdown-body ul ul ol,
+    .markdown-body ul ol ol,
+    .markdown-body ol ul ol,
+    .markdown-body ol ol ol {
+      list-style-type: lower-alpha;
+    }
+
+    .markdown-body dd {
+      margin-left: 0;
+    }
+
+    .markdown-body code {
+      font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      font-size: 12px;
+    }
+
+    .markdown-body pre {
+      margin-top: 0;
+      margin-bottom: 0;
+      font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    }
+
+    .markdown-body .octicon {
+      font: normal normal normal 16px/1 octicons-anchor;
+      display: inline-block;
+      text-decoration: none;
+      text-rendering: auto;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .markdown-body .octicon-link:before {
+      content: '\f05c';
+    }
+
+    .markdown-body > *:first-child {
+      margin-top: 0 !important;
+    }
+
+    .markdown-body > *:last-child {
+      margin-bottom: 0 !important;
+    }
+
+    .markdown-body a:not([href]) {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .markdown-body .anchor {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      padding-right: 6px;
+      padding-left: 30px;
+      margin-left: -30px;
+    }
+
+    .markdown-body .anchor:focus {
+      outline: none;
+    }
+
+    .markdown-body h1,
+    .markdown-body h2,
+    .markdown-body h3,
+    .markdown-body h4,
+    .markdown-body h5,
+    .markdown-body h6 {
+      position: relative;
+      margin-top: 1em;
+      margin-bottom: 16px;
+      font-weight: bold;
+      line-height: 1.4;
+    }
+
+    .markdown-body h1 .octicon-link,
+    .markdown-body h2 .octicon-link,
+    .markdown-body h3 .octicon-link,
+    .markdown-body h4 .octicon-link,
+    .markdown-body h5 .octicon-link,
+    .markdown-body h6 .octicon-link {
+      display: none;
+      color: #000;
+      vertical-align: middle;
+    }
+
+    .markdown-body h1:hover .anchor,
+    .markdown-body h2:hover .anchor,
+    .markdown-body h3:hover .anchor,
+    .markdown-body h4:hover .anchor,
+    .markdown-body h5:hover .anchor,
+    .markdown-body h6:hover .anchor {
+      padding-left: 8px;
+      margin-left: -30px;
+      text-decoration: none;
+    }
+
+    .markdown-body h1:hover .anchor .octicon-link,
+    .markdown-body h2:hover .anchor .octicon-link,
+    .markdown-body h3:hover .anchor .octicon-link,
+    .markdown-body h4:hover .anchor .octicon-link,
+    .markdown-body h5:hover .anchor .octicon-link,
+    .markdown-body h6:hover .anchor .octicon-link {
+      display: inline-block;
+    }
+
+    .markdown-body h1 {
+      padding-bottom: 0.3em;
+      font-size: 2.25em;
+      line-height: 1.2;
+      border-bottom: 1px solid #eee;
+    }
+
+    .markdown-body h1 .anchor {
+      line-height: 1;
+    }
+
+    .markdown-body h2 {
+      padding-bottom: 0.3em;
+      font-size: 1.75em;
+      line-height: 1.225;
+      border-bottom: 1px solid #eee;
+    }
+
+    .markdown-body h2 .anchor {
+      line-height: 1;
+    }
+
+    .markdown-body h3 {
+      font-size: 1.5em;
+      line-height: 1.43;
+    }
+
+    .markdown-body h3 .anchor {
+      line-height: 1.2;
+    }
+
+    .markdown-body h4 {
+      font-size: 1.25em;
+    }
+
+    .markdown-body h4 .anchor {
+      line-height: 1.2;
+    }
+
+    .markdown-body h5 {
+      font-size: 1em;
+    }
+
+    .markdown-body h5 .anchor {
+      line-height: 1.1;
+    }
+
+    .markdown-body h6 {
+      font-size: 1em;
+      color: #777;
+    }
+
+    .markdown-body h6 .anchor {
+      line-height: 1.1;
+    }
+
+    .markdown-body p,
+    .markdown-body blockquote,
+    .markdown-body ul,
+    .markdown-body ol,
+    .markdown-body dl,
+    .markdown-body table,
+    .markdown-body pre {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    .markdown-body hr {
+      height: 4px;
+      padding: 0;
+      margin: 16px 0;
+      background-color: #e7e7e7;
+      border: 0 none;
+    }
+
+    .markdown-body ul,
+    .markdown-body ol {
+      padding-left: 2em;
+    }
+
+    .markdown-body ul ul,
+    .markdown-body ul ol,
+    .markdown-body ol ol,
+    .markdown-body ol ul {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    .markdown-body li > p {
+      margin-top: 16px;
+    }
+
+    .markdown-body dl {
+      padding: 0;
+    }
+
+    .markdown-body dl dt {
+      padding: 0;
+      margin-top: 16px;
+      font-size: 1em;
+      font-style: italic;
+      font-weight: bold;
+    }
+
+    .markdown-body dl dd {
+      padding: 0 16px;
+      margin-bottom: 16px;
+    }
+
+    .markdown-body blockquote {
+      padding: 0 15px;
+      color: #777;
+      border-left: 4px solid #ddd;
+    }
+
+    .markdown-body blockquote > :first-child {
+      margin-top: 0;
+    }
+
+    .markdown-body blockquote > :last-child {
+      margin-bottom: 0;
+    }
+
+    .markdown-body table {
+      display: block;
+      width: 100%;
+      overflow: auto;
+      word-break: normal;
+      word-break: keep-all;
+    }
+
+    .markdown-body table th {
+      font-weight: bold;
+    }
+
+    .markdown-body table th,
+    .markdown-body table td {
+      padding: 6px 13px;
+      border: 1px solid #ddd;
+    }
+
+    .markdown-body table tr {
+      background-color: #fff;
+      border-top: 1px solid #ccc;
+    }
+
+    .markdown-body table tr:nth-child(2n) {
+      background-color: #f8f8f8;
+    }
+
+    .markdown-body img {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .markdown-body code {
+      padding: 0;
+      padding-top: 0.2em;
+      padding-bottom: 0.2em;
+      margin: 0;
+      font-size: 85%;
+      background-color: rgba(0, 0, 0, 0.04);
+      border-radius: 3px;
+    }
+
+    .markdown-body code:before,
+    .markdown-body code:after {
+      letter-spacing: -0.2em;
+      content: "\00a0";
+    }
+
+    .markdown-body pre > code {
+      padding: 0;
+      margin: 0;
+      font-size: 100%;
+      word-break: normal;
+      white-space: pre;
+      background: transparent;
+      border: 0;
+    }
+
+    .markdown-body .highlight {
+      margin-bottom: 16px;
+    }
+
+    .markdown-body .highlight pre,
+    .markdown-body pre {
+      padding: 16px;
+      overflow: auto;
+      font-size: 85%;
+      line-height: 1.45;
+      background-color: #f7f7f7;
+      border-radius: 3px;
+    }
+
+    .markdown-body .highlight pre {
+      margin-bottom: 0;
+      word-break: normal;
+    }
+
+    .markdown-body pre {
+      word-wrap: normal;
+    }
+
+    .markdown-body pre code {
+      display: inline;
+      max-width: initial;
+      padding: 0;
+      margin: 0;
+      overflow: initial;
+      line-height: inherit;
+      word-wrap: normal;
+      background-color: transparent;
+      border: 0;
+    }
+
+    .markdown-body pre code:before,
+    .markdown-body pre code:after {
+      content: normal;
+    }
+
+    .markdown-body kbd {
+      display: inline-block;
+      padding: 3px 5px;
+      font-size: 11px;
+      line-height: 10px;
+      color: #555;
+      vertical-align: middle;
+      background-color: #fcfcfc;
+      border: solid 1px #ccc;
+      border-bottom-color: #bbb;
+      border-radius: 3px;
+      box-shadow: inset 0 -1px 0 #bbb;
+    }
+
+    .markdown-body kbd {
+      display: inline-block;
+      padding: 3px 5px;
+      font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      line-height: 10px;
+      color: #555;
+      vertical-align: middle;
+      background-color: #fcfcfc;
+      border: solid 1px #ccc;
+      border-bottom-color: #bbb;
+      border-radius: 3px;
+      box-shadow: inset 0 -1px 0 #bbb;
+    }
+
+    .markdown-body .task-list-item {
+      list-style-type: none;
+    }
+
+    .markdown-body .task-list-item + .task-list-item {
+      margin-top: 3px;
+    }
+
+    .markdown-body .task-list-item input {
+      margin: 0 0.35em 0.25em -1.6em;
+      vertical-align: middle;
+    }
+
+    .markdown-body:checked + .radio-label {
+      z-index: 1;
+      position: relative;
+      border-color: #4078c0;
+    }
+
+    #readme, .examples {
+      min-width: 200px;
+      max-width: 790px;
+      margin: 30px auto;
+      padding: 0 30px;
+    }
+
+    #readme .boxed-group {
+      position: relative;
+      border-radius: 3px;
+      margin-bottom: 30px;
+    }
+
+    #readme .markdown-body,
+    #readme .plain,
+    .examples .examples-body {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+      padding: 30px;
+      word-wrap: break-word;
+    }
+
+    .boxed-group > h3,
+    .examples > h3,
+    .boxed-group .heading {
+      background-color: #f5f5f5;
+      margin: 0;
+      border-radius: 3px 3px 0 0;
+      border: 1px solid #d8d8d8;
+      border-bottom: 0;
+      padding: 9px 10px 10px;
+      font-size: 14px;
+      line-height: 17px;
+      display: block;
+    }
+
+    .examples-body ul {
+      margin: 0;
+    }
+  </style>
+  <style type="text/css">
+    /*
+
+    github.com style (c) Vasily Polovnyov <vast@whiteants.net>
+
+    */
+
+    .hljs {
+      display: block;
+      overflow-x: auto;
+      padding: 0.5em;
+      color: #333;
+      background: #f8f8f8;
+      -webkit-text-size-adjust: none;
+    }
+
+    .hljs-comment,
+    .diff .hljs-header {
+      color: #998;
+      font-style: italic;
+    }
+
+    .hljs-keyword,
+    .css .rule .hljs-keyword,
+    .hljs-winutils,
+    .nginx .hljs-title,
+    .hljs-subst,
+    .hljs-request,
+    .hljs-status {
+      color: #333;
+      font-weight: bold;
+    }
+
+    .hljs-number,
+    .hljs-hexcolor,
+    .ruby .hljs-constant {
+      color: #008080;
+    }
+
+    .hljs-string,
+    .hljs-tag .hljs-value,
+    .hljs-doctag,
+    .tex .hljs-formula {
+      color: #d14;
+    }
+
+    .hljs-title,
+    .hljs-id,
+    .scss .hljs-preprocessor {
+      color: #900;
+      font-weight: bold;
+    }
+
+    .hljs-list .hljs-keyword,
+    .hljs-subst {
+      font-weight: normal;
+    }
+
+    .hljs-class .hljs-title,
+    .hljs-type,
+    .vhdl .hljs-literal,
+    .tex .hljs-command {
+      color: #458;
+      font-weight: bold;
+    }
+
+    .hljs-tag,
+    .hljs-tag .hljs-title,
+    .hljs-rule .hljs-property,
+    .django .hljs-tag .hljs-keyword {
+      color: #000080;
+      font-weight: normal;
+    }
+
+    .hljs-attribute,
+    .hljs-variable,
+    .lisp .hljs-body,
+    .hljs-name {
+      color: #008080;
+    }
+
+    .hljs-regexp {
+      color: #009926;
+    }
+
+    .hljs-symbol,
+    .ruby .hljs-symbol .hljs-string,
+    .lisp .hljs-keyword,
+    .clojure .hljs-keyword,
+    .scheme .hljs-keyword,
+    .tex .hljs-special,
+    .hljs-prompt {
+      color: #990073;
+    }
+
+    .hljs-built_in {
+      color: #0086b3;
+    }
+
+    .hljs-preprocessor,
+    .hljs-pragma,
+    .hljs-pi,
+    .hljs-doctype,
+    .hljs-shebang,
+    .hljs-cdata {
+      color: #999;
+      font-weight: bold;
+    }
+
+    .hljs-deletion {
+      background: #fdd;
+    }
+
+    .hljs-addition {
+      background: #dfd;
+    }
+
+    .diff .hljs-change {
+      background: #0086b3;
+    }
+
+    .hljs-chunk {
+      color: #aaa;
+    }
+
+    .header {
+      min-width: 200px;
+      max-width: 790px;
+      margin:0 auto;
+    }
+  </style>
+</head>
+
+<body>
+<div class="header">
+  <h1>cmn-utils@0.1.2</h1>
+</div>
+<div class="examples">
+  <h3>EXAMPLES</h3>
+  <div class="examples-body">
+    <ul>
+      
+      <li><a href="examples\simple.html">simple</a></li>
+      
+    </ul>
+  </div>
+</div>
+<div id="readme" class="boxed-group">
+  <h3>README.md</h3>
+  <div class="markdown-body">
+    <h1>cmn-utils<a id="user-content-cmn-utils" name="cmn-utils" class="anchor" aria-hidden="true" href="#cmn-utils"><span class="octicon octicon-link"></span></a></h1><p><a href="https://npmjs.org/package/cmn-utils" title="null"><img src="https://img.shields.io/npm/v/cmn-utils.svg?style=flat" alt="NPM version"></a>
+<a href="https://npmjs.org/package/cmn-utils" title="null"><img src="http://img.shields.io/npm/dm/cmn-utils.svg?style=flat" alt="NPM downloads"></a>
+<a href="https://david-dm.org/sorrycc/cmn-utils" title="null"><img src="https://david-dm.org/sorrycc/cmn-utils/status.svg" alt="Dependencies"></a></p>
+<p>React中可复用的通用模块, 一些不常用的函数，或在全局函数里会引起奇异的函数没有引出到全局，可以使用$$.request | $$.store 等间接使用，或<code>import { request } from &#39;cmn-utils&#39;</code>，也可以直接使用 <code>import request from &#39;cmn-utils/lib/request&#39;</code></p>
+<h1>目录<a id="user-content-目录" name="目录" class="anchor" aria-hidden="true" href="#目录"><span class="octicon octicon-link"></span></a></h1><ul>
+<li><a href="#request" title="Request">Request</a> <a href="https://github.com/LANIF-UI/cmn-utils/tree/master/src/request" title="null">详细</a></li>
+<li><a href="#store" title="Store">Store</a> <a href="https://github.com/LANIF-UI/cmn-utils/tree/master/src/store" title="null">详细</a></li>
+<li><a href="#event" title="Event">Event</a></li>
+<li><a href="#ui" title="UI">UI</a></li>
+<li><a href="#utils" title="Utils">Utils</a></li>
+</ul>
+<h1>Request<a id="user-content-request" name="request" class="anchor" aria-hidden="true" href="#request"><span class="octicon octicon-link"></span></a></h1><p>简单包装的Fetch</p>
+<h2>API<a id="user-content-api" name="api" class="anchor" aria-hidden="true" href="#api"><span class="octicon octicon-link"></span></a></h2><ul>
+<li>requestConfig 配置所有默认选项</li>
+<li>requestHeaders 设置headers, 支持 object | key-value | function 类型参数</li>
+<li>send 发送请求</li>
+<li>getform, postform, get, post, head, del, put 发送请求(这些都是简化的send)</li>
+<li><em>下面为不在$$中的方法</em></li>
+<li>create 返回新实例</li>
+<li>config 同 requestConfig</li>
+<li>headers 同 requestHeaders</li>
+<li>prefix 设置请求前缀，可在config中设置</li>
+<li>beforeRequest 请求前hook</li>
+<li>afterResponse 响应后hook</li>
+<li>contentType 设置content-type</li>
+</ul>
+<h2>使用<a id="user-content-使用" name="使用" class="anchor" aria-hidden="true" href="#使用"><span class="octicon octicon-link"></span></a></h2><div class="highlight"><pre><code language="javascript"><span class="hljs-keyword">import</span> $$ from <span class="hljs-string">'cmn-utils'</span>;
+
+<span class="hljs-comment">// 发送请求</span>
+$$.send(<span class="hljs-string">'/send'</span>)
+$$.get(<span class="hljs-string">'/get/1'</span>)
+$$.post(<span class="hljs-string">'/post'</span>)
+$$.put(<span class="hljs-string">'/put'</span>)
+$$.del(<span class="hljs-string">'/put/1'</span>)</code></pre></div><h4>默认选项<a id="user-content-默认选项" name="默认选项" class="anchor" aria-hidden="true" href="#默认选项"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="js">{
+    method: <span class="hljs-string">'POST'</span>,         <span class="hljs-comment">// default 'POST'</span>
+    mode: <span class="hljs-string">'cors'</span>,
+    cache: <span class="hljs-string">'no-cache'</span>,
+    credentials: <span class="hljs-string">'include'</span>,
+    headers: {
+      <span class="hljs-string">'content-type'</span>: <span class="hljs-string">'application/json'</span>
+    },
+    responseType: <span class="hljs-string">'json'</span>,   <span class="hljs-comment">// text or blob or formData https://fetch.spec.whatwg.org/</span>
+    prefix: <span class="hljs-string">''</span>,             <span class="hljs-comment">// request prefix</span>
+    beforeRequest: <span class="hljs-literal">null</span>,    <span class="hljs-comment">// before request check, return false or a rejected Promise will stop request</span>
+    afterResponse: <span class="hljs-literal">null</span>,    <span class="hljs-comment">// after request hook</span>
+  }</code></pre></div><h3>基本使用<a id="user-content-基本使用" name="基本使用" class="anchor" aria-hidden="true" href="#基本使用"><span class="octicon octicon-link"></span></a></h3><h4>简化写法<a id="user-content-简化写法" name="简化写法" class="anchor" aria-hidden="true" href="#简化写法"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="javascript"><span class="hljs-comment">// 原始fetch 写法</span>
+fetch(<span class="hljs-string">'http://httpbin.org/post'</span>, {
+  method: <span class="hljs-string">'POST'</span>,
+  headers: {
+    <span class="hljs-string">'content-type'</span>: <span class="hljs-string">'application/json'</span>
+  },
+  body: <span class="hljs-built_in">JSON</span>.stringify({
+    name: <span class="hljs-string">'weiq'</span>,
+  })
+})
+.then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">response</span>) </span>{
+  <span class="hljs-keyword">if</span> (response.status &gt;= <span class="hljs-number">200</span> &amp;&amp; response.status &lt; <span class="hljs-number">300</span>) {
+    <span class="hljs-keyword">return</span> response.json()
+  }
+  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(response.statusText)
+})
+.then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">json</span>) </span>{
+  <span class="hljs-comment">// ...</span>
+})
+
+<span class="hljs-comment">// 等价于，直接使用send方法</span>
+$$.send(<span class="hljs-string">'http://httpbin.org/post'</span>, {
+    method: <span class="hljs-string">'POST'</span>,
+    data: {name: <span class="hljs-string">'weiq'</span>}
+  }).then(resp =&gt; {
+    <span class="hljs-built_in">console</span>.log(resp.json) <span class="hljs-comment">// {name: 'weiq'}</span>
+  })
+
+<span class="hljs-comment">// 等价于，使用提供的post方法</span>
+$$.post(<span class="hljs-string">'http://httpbin.org/post'</span>, {name: <span class="hljs-string">'weiq'</span>})
+  .then(resp =&gt; {
+    <span class="hljs-built_in">console</span>.log(resp.json) <span class="hljs-comment">// {name: 'weiq'}</span>
+  })</code></pre></div><h4>提交form表单<a id="user-content-提交form表单" name="提交form表单" class="anchor" aria-hidden="true" href="#提交form表单"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="js"><span class="hljs-comment">// 提交form表单</span>
+$$.getform(<span class="hljs-string">'/form'</span>, {name: <span class="hljs-string">'weiq'</span>}) <span class="hljs-comment">// 将拼接到url后面</span>
+  <span class="hljs-comment">//.postform('/form', {name: 'weiq'}) // 将做为Form Data发送</span>
+  .then(resp =&gt; {
+    <span class="hljs-built_in">console</span>.log(resp.json) <span class="hljs-comment">// {name: 'weiq'}</span>
+  })</code></pre></div><h4>全局配置, 将会覆盖默认参数, 一般全局配置一次<a id="user-content-全局配置,-将会覆盖默认参数,-一般全局配置一次" name="全局配置,-将会覆盖默认参数,-一般全局配置一次" class="anchor" aria-hidden="true" href="#全局配置,-将会覆盖默认参数,-一般全局配置一次"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="js"><span class="hljs-comment">// 全局配置, 将会覆盖默认参数, 一般全局配置一次</span>
+$$.requestConfig(<span class="hljs-string">'method'</span>, <span class="hljs-string">'GET'</span>)
+  .requestConfig({
+    headers: {<span class="hljs-string">'content-type'</span>: <span class="hljs-string">'application/json'</span>},
+    prefix: <span class="hljs-string">'/api'</span>
+  })
+<span class="hljs-comment">// 配置请求头</span>
+$$.requestHeaders(<span class="hljs-string">'Accept'</span>, <span class="hljs-string">'application/json'</span>)  <span class="hljs-comment">// key-value</span>
+  .requestHeaders({ Accept: <span class="hljs-string">'application/json'</span> }) <span class="hljs-comment">// json</span>
+
+<span class="hljs-comment">// 用函数反回头</span>
+$$.requestHeaders(_ =&gt; ({
+    random: <span class="hljs-built_in">Math</span>.random()
+  }))</code></pre></div><h4>临时改变配置项<a id="user-content-临时改变配置项" name="临时改变配置项" class="anchor" aria-hidden="true" href="#临时改变配置项"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="js">$$.post(<span class="hljs-string">'http://httpbin.org/post'</span>, {name: <span class="hljs-string">'weiq'</span>}, {
+    headers: {
+      <span class="hljs-string">'content-type'</span>: <span class="hljs-string">'application/json'</span>
+    },
+    responseType: <span class="hljs-string">'json'</span>,
+  })
+  .then(resp =&gt; {
+    <span class="hljs-built_in">console</span>.log(resp.json) <span class="hljs-comment">// {name: 'weiq'}</span>
+  })</code></pre></div><h1>Store<a id="user-content-store" name="store" class="anchor" aria-hidden="true" href="#store"><span class="octicon octicon-link"></span></a></h1><p>简单包装的store2</p>
+<h2>API<a id="user-content-api" name="api" class="anchor" aria-hidden="true" href="#api"><span class="octicon octicon-link"></span></a></h2><ul>
+<li>setStore</li>
+<li>getStore </li>
+<li>removeStore </li>
+<li>clearStore</li>
+<li><em>下面为不在$$中的方法</em></li>
+<li>getStoreAsync</li>
+<li>create</li>
+<li>getStoreInfo</li>
+<li>getStoreInfoAsync</li>
+<li>session</li>
+<li>local</li>
+</ul>
+<div class="highlight"><pre><code language="javascript">$$.setStore(<span class="hljs-string">"name"</span>, <span class="hljs-string">"abc"</span>)
+  .setStore(<span class="hljs-string">"multi"</span>, {ip: <span class="hljs-string">'0.0.0.0'</span>})
+  .setStore(<span class="hljs-string">"age"</span>, <span class="hljs-number">18</span>)
+  .setStore({
+    a: <span class="hljs-number">1</span>,
+    b: <span class="hljs-number">2</span>,
+    c: <span class="hljs-literal">true</span>
+  })
+$$.getStore(<span class="hljs-string">"multi"</span>);
+
+$$.removeStore(<span class="hljs-string">'name'</span>)
+
+$$.clearStore()
+
+$$.store.getStoreAsync(<span class="hljs-string">"name"</span>).then(value =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"async:"</span>, value));
+
+$$.store.getStoreInfo();
+
+$$.store
+  .getStoreInfoAsync(value =&gt; <span class="hljs-built_in">console</span>.log(value))
+  .setStore(<span class="hljs-string">'name'</span>, <span class="hljs-string">'abc'</span>);
+
+$$.store.session(<span class="hljs-string">'name'</span>, <span class="hljs-string">'abc'</span>); <span class="hljs-comment">// 存储到 sessionStorage中</span>
+$$.store.local(<span class="hljs-string">'name'</span>, <span class="hljs-string">'abc'</span>); <span class="hljs-comment">// 存储到 localStorage中</span></code></pre></div><h1>Event<a id="user-content-event" name="event" class="anchor" aria-hidden="true" href="#event"><span class="octicon octicon-link"></span></a></h1><p>让组件可以发射、监听自定义事件, 有时我们可能需要让两个没有太大关系的组件间建立联系，比如增加商品到购物车这个场景，一般会在页面头部（<code>Header</code>组件）放置购物车的图标，商品列表（<code>Goods</code>组件）中有一个添加到购物车的图标，我们想点击这个图标时，让头部购物车图标显示+1的效果，有几种方案，其一是在头部定义一个<code>changeCardNumber</code>方法，然后把这个方法层层传递到商品列表（<code>Goods</code>）中，进行调用，这很容易出错，其二是点击商品列表中商品时，通过<code>dispatch</code>发出一个类型是<code>changeCardNumber</code>的<code>action</code>，这种方法我们不得不把<code>Header</code>包装一下才可以让它处理<code>dispatch</code>的能力, 最后如果我们用自定义事件可以更容易实现这个效果，即在<code>Header</code>中订阅一个<code>changeCardNumber</code>这个事件，在其它任何地方只有触发<code>trigger</code>这个事件就可以了，只需要注意不用的事件要及时移除。</p>
+<h2>API<a id="user-content-api" name="api" class="anchor" aria-hidden="true" href="#api"><span class="octicon octicon-link"></span></a></h2><ul>
+<li>on 注册事件监听</li>
+<li>off 移除事件监听</li>
+<li>once 注册一次事件监听，只能触发一次trigger触发后即自动从监听中移除</li>
+<li>trigger 触发事件</li>
+</ul>
+<h4>示例<a id="user-content-示例" name="示例" class="anchor" aria-hidden="true" href="#示例"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="javascript">$$.on(<span class="hljs-string">'eventName'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
+  <span class="hljs-built_in">console</span>.log(value)
+});
+
+$$.trigger(<span class="hljs-string">'eventName'</span>);
+
+$$.off(<span class="hljs-string">'eventName'</span>);
+
+$$.once(<span class="hljs-string">'eventName'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
+  <span class="hljs-built_in">console</span>.log(value)
+});</code></pre></div>
+  </div>
+</div>
+<a href=""><img style="position: absolute; top: 0; right: 0; border: 0;"
+                            src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
+                            alt="Fork me on GitHub"
+                            data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+</body>
+
+</html>
