@@ -9,7 +9,6 @@ request
   })
   .errorHandle(e => {
     console.error("my error handle:", e);
-    return;
   });
 
 const A = () => {
