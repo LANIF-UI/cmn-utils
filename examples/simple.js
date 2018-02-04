@@ -6,11 +6,11 @@ import $$, {store, request} from '../src/index';
 request
   .afterResponse(resp => {
     return resp;
+  })
+  .errorHandle(e => {
+    console.error("my error handle:", e);
+    return;
   });
-
-window.addEventListener('unhandledrejection', function(event) {
- console.log(2222)
-});
 
 const A = () => {
   function set() {
@@ -43,7 +43,7 @@ const A = () => {
   }
 
   function requestGet() {
-    $$.get('http://httpbin.org/get')
+    $$.get('http://httpbin.org/post')
       .then(resp => console.log(resp))
       .catch(e => console.log(e))
   }

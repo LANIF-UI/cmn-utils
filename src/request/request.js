@@ -20,6 +20,7 @@ export default class Request {
     prefix: '',             // request prefix
     beforeRequest: null,    // before request check, return false or a rejected Promise will stop request
     afterResponse: null,    // after request hook
+    errorHandle: null,      // global error handle
   }
 
   constructor(opts = {}) {
@@ -82,7 +83,7 @@ export default class Request {
   }
 
   beforeRequest = (cb) => {
-    const options = this._options
+    const options = this._options;
     if (isFunction(cb)) {
       options.beforeRequest = cb;
     }
@@ -90,9 +91,17 @@ export default class Request {
   }
 
   afterResponse = (cb) => {
-    const options = this._options
+    const options = this._options;
     if (isFunction(cb)) {
       options.afterResponse = cb;
+    }
+    return this;
+  }
+
+  errorHandle = (cb) => {
+    const options = this._options;
+    if (isFunction(cb)) {
+      options.errorHandle = cb;
     }
     return this;
   }
@@ -216,7 +225,7 @@ export default class Request {
 
     const options = { ...this._options, ...otherOpts };
 
-    const { beforeRequest, afterResponse, responseType, prefix, headers, ...fetchOpts } = options;
+    const { beforeRequest, afterResponse, errorHandle, responseType, prefix, headers, ...fetchOpts } = options;
 
     const { __headersFun__, ...realheaders } = headers;
     let newheaders = { ...realheaders };
@@ -258,7 +267,7 @@ export default class Request {
       .then(resp => this.__parseResponse(resp, responseType))
       .then(resp => this.__afterResponse(resp, afterResponse))
       .then(response => resolve(response))
-      .catch(e => reject(e));
+      .catch(e => this.__errorHandle(e, errorHandle, reject));
   })
 
   __checkStatus(response) {
@@ -291,6 +300,12 @@ export default class Request {
       }
     } else {
       return response;
+    }
+  }
+
+  __errorHandle(e, errorHandle, reject) {
+    if (!isFunction(errorHandle) || errorHandle(e) !== false) {
+      reject(e);
     }
   }
 }
