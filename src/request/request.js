@@ -1,4 +1,4 @@
-import {isFunction, isObject} from '../utils';
+import { isFunction, isObject, param } from '../utils';
 
 export const REQUEST_METHODS = [
   'GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PUT', 'PATCH'
@@ -29,19 +29,19 @@ export default class Request {
     }
 
     // normalize the headers
-    const headers = this._options.headers
+    const headers = this._options.headers;
 
     for (let h in headers) {
       if (h !== h.toLowerCase()) {
-        headers[h.toLowerCase()] = headers[h]
-        delete headers[h]
+        headers[h.toLowerCase()] = headers[h];
+        delete headers[h];
       }
     }
 
     REQUEST_METHODS.forEach((method) => {
       this[method.toLowerCase()] = (url, data, opts = {}) => {
         opts.data = data;
-        return this.send(url, {...opts, method})
+        return this.send(url, { ...opts, method });
       }
     })
   }
@@ -67,10 +67,10 @@ export default class Request {
 
     if (typeof key === 'object') {
       for (let k in key) {
-        options[k] = key[k]
+        options[k] = key[k];
       }
     } else {
-      options[key] = value
+      options[key] = value;
     }
 
     return this;
@@ -83,16 +83,16 @@ export default class Request {
 
   beforeRequest = (cb) => {
     const options = this._options
-    if (cb && typeof cb === 'function') {
-      options.beforeRequest = cb
+    if (isFunction(cb)) {
+      options.beforeRequest = cb;
     }
     return this;
   }
 
   afterResponse = (cb) => {
     const options = this._options
-    if (cb && typeof cb === 'function') {
-      options.afterResponse = cb
+    if (isFunction(cb)) {
+      options.afterResponse = cb;
     }
     return this;
   }
@@ -110,16 +110,16 @@ export default class Request {
    * @return {Request}
    */
   headers = (key, value) => {
-    const {headers} = this._options;
+    const { headers } = this._options;
 
     if (isObject(key)) {
       for (let k in key) {
-        headers[k.toLowerCase()] = key[k]
+        headers[k.toLowerCase()] = key[k];
       }
     } else if (isFunction(key)) {
       headers.__headersFun__ = key;
-    }else {
-      headers[key.toLowerCase()] = value
+    } else {
+      headers[key.toLowerCase()] = value;
     }
 
     return this;
@@ -131,19 +131,19 @@ export default class Request {
    * @param {String} type
    */
   contentType = (type) => {
-    const {headers} = this._options;
+    const { headers } = this._options;
 
     switch (type) {
-    case 'json':
-      type = 'application/json'
-      break;
-    case 'form':
-    case 'urlencoded':
-      type = 'application/x-www-form-urlencoded;charset=UTF-8'
-      break;
-    case 'multipart':
-      type = 'multipart/form-data'
-      break;
+      case 'json':
+        type = 'application/json';
+        break;
+      case 'form':
+      case 'urlencoded':
+        type = 'application/x-www-form-urlencoded;charset=UTF-8';
+        break;
+      case 'multipart':
+        type = 'multipart/form-data';
+        break;
     }
 
     headers['content-type'] = type;
@@ -156,7 +156,7 @@ export default class Request {
     // if FormData
     if (contentType.indexOf('multipart/form-data') !== -1) {
       body = new FormData();
-      
+
       if (data instanceof FormData) {
         body = data;
         return body;
@@ -164,7 +164,7 @@ export default class Request {
 
       if (typeof data === 'object') {
         for (let k in data) {
-          body.append(k, data[k])
+          body.append(k, data[k]);
         }
       }
     } else {
@@ -185,7 +185,7 @@ export default class Request {
    */
   getform = (url, opts = {}) => {
     return this.send(url, {
-      ...opts, 
+      ...opts,
       method: 'GET',
       headers: {
         'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
@@ -198,7 +198,7 @@ export default class Request {
    */
   postform = (url, opts = {}) => {
     return this.send(url, {
-      ...opts, 
+      ...opts,
       method: 'POST',
       headers: {
         'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
@@ -212,18 +212,18 @@ export default class Request {
       return reject(new Error('invalid url'));
     }
 
-    const {data, ...otherOpts} = opts;
+    const { data, ...otherOpts } = opts;
 
-    const options = {...this._options, ...otherOpts};
+    const options = { ...this._options, ...otherOpts };
 
     const { beforeRequest, afterResponse, responseType, prefix, headers, ...fetchOpts } = options;
 
-    const {__headersFun__, ...realheaders} = headers;
-    let newheaders = {...realheaders};
+    const { __headersFun__, ...realheaders } = headers;
+    let newheaders = { ...realheaders };
     if (__headersFun__) {
       const _newheaders = __headersFun__();
       if (_newheaders && isObject(_newheaders)) {
-        newheaders = {...realheaders, ..._newheaders}
+        newheaders = { ...realheaders, ..._newheaders };
       }
     }
 
@@ -238,60 +238,59 @@ export default class Request {
     } else {
       fetchOpts.body = body;
     }
-    
+
     // if 'GET' request, join _body of url queryString
     if (fetchOpts.method.toUpperCase() === 'GET' && body) {
       if (url.indexOf('?') >= 0) {
-        url += '&' + param(body)
+        url += '&' + param(body);
       } else {
-        url += '?' + param(body)
+        url += '?' + param(body);
       }
       delete fetchOpts.body;
     }
 
-    if (beforeRequest && typeof beforeRequest === 'function' && beforeRequest(url, options) === false) {
-      return reject(new Error('request canceled by beforeRequest'))
+    if (isFunction(beforeRequest) && beforeRequest(url, options) === false) {
+      return reject(new Error('request canceled by beforeRequest'));
     }
 
-    const promise = fetch(prefix + url, {headers: newheaders, ...fetchOpts}).then((response) => {
-      if (response.status >= 200 && response.status < 300) {
-        if (response.status == 204) {
-          return null;
-        }
+    return fetch(prefix + url, { headers: newheaders, ...fetchOpts })
+      .then(resp => this.__checkStatus(resp))
+      .then(resp => this.__parseResponse(resp, responseType))
+      .then(resp => this.__afterResponse(resp, afterResponse))
+      .then(response => resolve(response))
+      .catch(e => reject(e));
+  })
 
-        return typeof response[responseType] === 'function' ? response[responseType]() : response;
+  __checkStatus(response) {
+    if (response.status >= 200 && response.status < 300) {
+      if (response.status == 204) {
+        return null;
       }
-      const errortext = response.statusText;
-    
-      const error = new Error(errortext);
-      error.code = response.status;
-      error.response = response;
-
-      return reject(error);
-    });
-
-    if (isFunction(afterResponse)) {
-      return promise.then(response => {
-        const after = afterResponse(response);
-        if (after && after.then) {
-          after.then(afterResp => {
-            resolve(afterResp);
-          })
-        } else{
-          resolve(after);
-        }
-      }).catch(e => {
-        reject(e)
-      })
+      return response;
     }
+    const errortext = response.statusText;
+    const error = new Error(errortext);
+    error.code = response.status;
+    error.response = response;
+    throw error;
+  }
 
-    return promise.then(response => resolve(response));
-  })
-}
+  __parseResponse(response, responseType) {
+    return isFunction(response && response[responseType]) ? response[responseType]() : response;
+  }
 
-function param (obj) {
-  var arr = Object.keys(obj).map(function (k) {
-    return k + '=' + encodeURIComponent(obj[k])
-  })
-  return arr.join('&').replace(/%20/g, '+')
+  __afterResponse(response, afterResponse) {
+    if (isFunction(afterResponse)) {
+      const after = afterResponse(response);
+      if (after && after.then) {
+        after.then(afterResp => {
+          return afterResp;
+        })
+      } else {
+        return after
+      }
+    } else {
+      return response;
+    }
+  }
 }

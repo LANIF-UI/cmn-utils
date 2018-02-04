@@ -1,7 +1,16 @@
 /* eslint-disable no-console */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import $$, {store} from '../src/index';
+import $$, {store, request} from '../src/index';
+
+request
+  .afterResponse(resp => {
+    return resp;
+  });
+
+window.addEventListener('unhandledrejection', function(event) {
+ console.log(2222)
+});
 
 const A = () => {
   function set() {
@@ -33,8 +42,8 @@ const A = () => {
       .setStore('name', 'def');
   }
 
-  function get() {
-    $$.get('http://httpbin.org/post')
+  function requestGet() {
+    $$.send('http://httpbin.org/get')
       .then(resp => console.log(resp))
       .catch(e => console.log(e))
   }
@@ -51,7 +60,7 @@ const A = () => {
       <button onClick={e => $$.removeStore('name')}>删除</button>
       <button onClick={e => $$.clearStore()}>清空</button>
       <h1>Request</h1>
-      <button onClick={get}>get</button>
+      <button onClick={requestGet}>get</button>
     </div>
   )
 }
