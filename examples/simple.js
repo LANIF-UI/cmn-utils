@@ -43,7 +43,7 @@ const A = () => {
   }
 
   function requestGet() {
-    $$.send('http://httpbin.org/get')
+    $$.get('http://httpbin.org/get')
       .then(resp => console.log(resp))
       .catch(e => console.log(e))
   }
