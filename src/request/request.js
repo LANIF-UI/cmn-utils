@@ -1,4 +1,5 @@
 import { isFunction, isObject, param } from '../utils';
+import RequestError from './error';
 
 export const REQUEST_METHODS = [
   'GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PUT', 'PATCH'
@@ -218,7 +219,7 @@ export default class Request {
   // send request
   send = (url, opts = {}) => new Promise((resolve, reject) => {
     if (typeof url !== 'string') {
-      return reject(new Error('invalid url'));
+      return reject(new RequestError('invalid url', 'invalidURL'));
     }
 
     const { data, ...otherOpts } = opts;
@@ -259,7 +260,7 @@ export default class Request {
     }
 
     if (isFunction(beforeRequest) && beforeRequest(url, options) === false) {
-      return reject(new Error('request canceled by beforeRequest'));
+      return reject(new RequestError('request canceled by beforeRequest', 'requestCanceled'));
     }
 
     return fetch(prefix + url, { headers: newheaders, ...fetchOpts })
@@ -278,8 +279,7 @@ export default class Request {
       return response;
     }
     const errortext = response.statusText;
-    const error = new Error(errortext);
-    error.code = response.status;
+    const error = new RequestError(errortext, response.status);
     error.response = response;
     throw error;
   }
@@ -304,6 +304,10 @@ export default class Request {
   }
 
   __errorHandle(e, errorHandle, reject) {
+    if (e.name !== 'RequestError') {
+      e.name = 'RequestError';
+      e.code = 0;
+    }
     if (!isFunction(errorHandle) || errorHandle(e) !== false) {
       reject(e);
     }
