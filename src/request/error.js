@@ -22,10 +22,6 @@ export default class RequestError extends Error {
   constructor(message, code = 0) {
     super(message);
 
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, RequestError);
-    }
-
     this.text = codeMessage[code];
     this.code = code;
     this.date = new Date();
