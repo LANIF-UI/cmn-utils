@@ -613,6 +613,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["isFunction"] = isFunction;
 /* harmony export (immutable) */ __webpack_exports__["isObject"] = isObject;
 /* harmony export (immutable) */ __webpack_exports__["asyncFunc"] = asyncFunc;
+/* harmony export (immutable) */ __webpack_exports__["delay"] = delay;
 /**
   * 生成指定位数的随机数
   * @param {int} x 
@@ -669,6 +670,20 @@ function asyncFunc(func) {
       return resolve(isFunction(func) ? resolve(func(_arguments)) : reject(new TypeError(func + 'is not function')));
     });
   };
+}
+
+/**
+ * 延时任意毫秒
+ * @param {number} time 毫秒
+ * 例：
+ *   delay(500).then(() => console.log('after 500ms'))
+ */
+function delay() {
+  var time = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+  return new Promise(function (res, rej) {
+    return setTimeout(res, time);
+  });
 }
 
 /***/ }),
@@ -19615,6 +19630,10 @@ var _initialiseProps = function _initialiseProps() {
 
       var options = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, _this2._options, otherOpts);
 
+      if (Object(__WEBPACK_IMPORTED_MODULE_3__utils__["isFunction"])(beforeRequest) && beforeRequest(url, options) === false) {
+        return reject(new __WEBPACK_IMPORTED_MODULE_4__error__["a" /* default */]('request canceled by beforeRequest', 'requestCanceled'));
+      }
+
       var beforeRequest = options.beforeRequest,
           afterResponse = options.afterResponse,
           errorHandle = options.errorHandle,
@@ -19654,10 +19673,6 @@ var _initialiseProps = function _initialiseProps() {
           url += '?' + Object(__WEBPACK_IMPORTED_MODULE_3__utils__["param"])(body);
         }
         delete fetchOpts.body;
-      }
-
-      if (Object(__WEBPACK_IMPORTED_MODULE_3__utils__["isFunction"])(beforeRequest) && beforeRequest(url, options) === false) {
-        return reject(new __WEBPACK_IMPORTED_MODULE_4__error__["a" /* default */]('request canceled by beforeRequest', 'requestCanceled'));
       }
 
       return fetch(prefix + url, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({ headers: newheaders }, fetchOpts)).then(function (resp) {
@@ -19742,10 +19757,6 @@ var RequestError = function (_Error) {
 
     _this.name = 'RequestError';
 
-
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(_this, RequestError);
-    }
 
     _this.text = codeMessage[code];
     _this.code = code;
