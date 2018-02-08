@@ -226,6 +226,10 @@ export default class Request {
 
     const options = { ...this._options, ...otherOpts };
 
+    if (isFunction(beforeRequest) && beforeRequest(url, options) === false) {
+      return reject(new RequestError('request canceled by beforeRequest', 'requestCanceled'));
+    }
+
     const { beforeRequest, afterResponse, errorHandle, responseType, prefix, headers, ...fetchOpts } = options;
 
     const { __headersFun__, ...realheaders } = headers;
@@ -257,10 +261,6 @@ export default class Request {
         url += '?' + param(body);
       }
       delete fetchOpts.body;
-    }
-
-    if (isFunction(beforeRequest) && beforeRequest(url, options) === false) {
-      return reject(new RequestError('request canceled by beforeRequest', 'requestCanceled'));
     }
 
     return fetch(prefix + url, { headers: newheaders, ...fetchOpts })

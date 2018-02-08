@@ -49,3 +49,13 @@ export function isObject(val) {
 export function asyncFunc(func) {
   return () => new Promise((resolve, reject) => resolve(isFunction(func) ? resolve(func(arguments)) : reject(new TypeError(func + 'is not function'))));
 }
+
+/**
+ * 延时任意毫秒
+ * @param {number} time 毫秒
+ * 例：
+ *   delay(500).then(() => console.log('after 500ms'))
+ */
+export function delay(time = 0) {
+  return new Promise((res, rej) => setTimeout(res, time));
+}
