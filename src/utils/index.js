@@ -23,6 +23,39 @@ export function param(obj) {
 }
 
 /**
+ * 查询字符串转为对象
+ * @return {object} {key1: value1, key2: value2}
+ */
+export function getQueryObject() {
+  return (function(a) {
+    if (a == '') return {};
+    var b = {};
+    for (var i = 0; i < a.length; ++i) {
+      var p = a[i].split('=');
+      if (p.length != 2) continue;
+      b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, ' '));
+    }
+    return b;
+  })(window.location.search.slice(1).split('&'));
+}
+
+/**
+ * 取查询字符串中某一个name的value
+ * @param {string} name 
+ * @param {string} url
+ * @return {string}
+ */
+export function getQueryValue(name, url) {
+  if (!url) url = window.location.href;
+  name = name.replace(/[\[\]]/g, "\\$&");
+  var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+/**
  * 是否为数组
  * @param {any} val 
  */
