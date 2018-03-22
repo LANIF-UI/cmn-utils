@@ -193,7 +193,8 @@ export default class Request {
   /**
    * GET send form
    */
-  getform = (url, opts = {}) => {
+  getform = (url, data, opts = {}) => {
+    opts.data = data;
     return this.send(url, {
       ...opts,
       method: 'GET',
@@ -206,7 +207,8 @@ export default class Request {
   /**
    * POST send form
    */
-  postform = (url, opts = {}) => {
+  postform = (url, data, opts = {}) => {
+    opts.data = data;
     return this.send(url, {
       ...opts,
       method: 'POST',
