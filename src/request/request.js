@@ -199,6 +199,7 @@ export default class Request {
       ...opts,
       method: 'GET',
       headers: {
+        ...this._options.headers,
         'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
       }
     })
@@ -213,6 +214,7 @@ export default class Request {
       ...opts,
       method: 'POST',
       headers: {
+        ...this._options.headers,
         'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
       }
     })
