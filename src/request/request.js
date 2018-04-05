@@ -33,7 +33,7 @@ export default class Request {
     // normalize the headers
     const headers = this._options.headers;
 
-    for (let h in headers) {
+    for (const h in headers) {
       if (h !== h.toLowerCase()) {
         headers[h.toLowerCase()] = headers[h];
         delete headers[h];
@@ -41,9 +41,9 @@ export default class Request {
     }
 
     REQUEST_METHODS.forEach((method) => {
-      this[method.toLowerCase()] = (url, data, opts = {}) => {
-        opts.data = data;
-        return this.send(url, { ...opts, method });
+      this[method.toLowerCase()] = (url, data, options = {}) => {
+        options.data = data;
+        return this.send(url, { ...options, method });
       }
     })
   }
@@ -65,10 +65,10 @@ export default class Request {
    * @return {Request}
    */
   config = (key, value) => {
-    const options = this._options
+    const options = this._options;
 
     if (typeof key === 'object') {
-      for (let k in key) {
+      for (const k in key) {
         options[k] = key[k];
       }
     } else {
@@ -123,7 +123,7 @@ export default class Request {
     const { headers } = this._options;
 
     if (isObject(key)) {
-      for (let k in key) {
+      for (const k in key) {
         headers[k.toLowerCase()] = key[k];
       }
     } else if (isFunction(key)) {
@@ -173,17 +173,17 @@ export default class Request {
       }
 
       if (typeof data === 'object') {
-        for (let k in data) {
+        for (const k in data) {
           body.append(k, data[k]);
         }
       }
     } else {
       if (body && typeof data === 'object') {
-        for (let key in data) {
-          body[key] = data[key]
+        for (const key in data) {
+          body[key] = data[key];
         }
       } else {
-        body = data
+        body = data;
       }
     }
 
@@ -202,7 +202,7 @@ export default class Request {
         ...this._options.headers,
         'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
       }
-    })
+    });
   }
 
   /**
@@ -217,7 +217,7 @@ export default class Request {
         ...this._options.headers,
         'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
       }
-    })
+    });
   }
 
   // send request
@@ -230,11 +230,11 @@ export default class Request {
 
     const options = { ...this._options, ...otherOpts };
 
+    const { beforeRequest, afterResponse, errorHandle, responseType, prefix, headers, ...fetchOpts } = options;
+
     if (isFunction(beforeRequest) && beforeRequest(url, options) === false) {
       return reject(new RequestError('request canceled by beforeRequest', 'requestCanceled'));
     }
-
-    const { beforeRequest, afterResponse, errorHandle, responseType, prefix, headers, ...fetchOpts } = options;
 
     const { __headersFun__, ...realheaders } = headers;
     let newheaders = { ...realheaders };
@@ -277,7 +277,7 @@ export default class Request {
 
   __checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
-      if (response.status == 204) {
+      if (response.status === 204) {
         return null;
       }
       return response;
@@ -295,16 +295,10 @@ export default class Request {
   __afterResponse(response, afterResponse) {
     if (isFunction(afterResponse)) {
       const after = afterResponse(response);
-      if (after && after.then) {
-        after.then(afterResp => {
-          return afterResp;
-        })
-      } else {
-        return after
-      }
-    } else {
-      return response;
+      return after;
     }
+
+    return response;
   }
 
   __errorHandle(e, errorHandle, reject) {

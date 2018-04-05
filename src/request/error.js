@@ -12,8 +12,8 @@ const codeMessage = {
   503: '服务不可用，服务器暂时过载或维护',
   504: '网关超时',
   0: '请求错误',
-  'invalidURL': '无效的请求URL',
-  'requestCanceled': '请求被提前取消了'
+  invalidURL: '无效的请求URL',
+  requestCanceled: '请求被提前取消了',
 };
 
 export default class RequestError extends Error {

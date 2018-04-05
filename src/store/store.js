@@ -3,18 +3,15 @@ import { isObject, isFunction } from '../utils';
 
 export default class Store {
   constructor(namespace) {
-    if (namespace) store.namespace;
-
-    this.session = store.session;
-    this.local = store.local;
+    this.store = namespace ? store.namespace(namespace) : store;
+    this.session = this.store.session;
+    this.local = this.store.local;
   }
 
   /**
    * 反回一个新的store
    */
-  create = (namespace) => {
-    return new Store(namespace);
-  }
+  create = (namespace) => new Store(namespace)
 
   /**
    * 将 value 存储在本地缓存中指定的 key 中，会覆盖掉原来该 key 对应的内容
@@ -27,9 +24,9 @@ export default class Store {
    */
   setStore = (key, value) => {
     if (isObject(key)) {
-      store.setAll(key);
+      this.store.setAll(key);
     } else {
-      store.set(key, value);
+      this.store.set(key, value);
     }
     return this;
   }
@@ -39,31 +36,24 @@ export default class Store {
    * @param {string} key 
    * @return {Promise}
    */
-  getStoreAsync = (key) => {
-    return Promise.resolve(store.get(key));
-  }
-
+  getStoreAsync = (key) => Promise.resolve(this.store.get(key))
   /**
    * 从本地缓存中同步获取指定 key 对应的内容
    * @param {string} key 
    */
-  getStore = (key) => {
-    return store.get(key)
-  }
+  getStore = (key) => this.store.get(key)
 
   /**
    * 获取当前Store的所有key-value信息,放入一个对象中
    */
-  getStoreInfo = () => {
-    return store.getAll();
-  }
+  getStoreInfo = () => this.store.getAll()
 
   /**
    * 获取当前Store的所有key-value信息,放入一个回调函数里,这样可以接着链式操作
    * .getStoreInfoAsync(v => v).setStore({})
    */
   getStoreInfoAsync = (cb) => {
-    if (isFunction(cb)) cb(store.getAll())
+    if (isFunction(cb)) cb(this.store.getAll());
     return this;
   }
 
@@ -72,7 +62,7 @@ export default class Store {
    * @param {string} key 
    */
   removeStore = (key) => {
-    store.remove(key)
+    this.store.remove(key);
     return this;
   }
 
@@ -80,7 +70,7 @@ export default class Store {
    * 清理本地数据缓存
    */
   clearStore = () => {
-    store.clearAll();
+    this.store.clearAll();
     return this;
   }
 

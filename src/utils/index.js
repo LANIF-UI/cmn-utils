@@ -3,9 +3,9 @@
   * @param {int} x 
   */
 export function randomStr(x) {
-  let s = "";
+  let s = '';
   while (s.length < x && x > 0) {
-    let v = Math.random() < 0.5 ? 32 : 0;
+    const v = Math.random() < 0.5 ? 32 : 0;
     s += String.fromCharCode(Math.round(Math.random() * ((122 - v) - (97 - v)) + (97 - v)));
   }
   return s;
@@ -16,7 +16,7 @@ export function randomStr(x) {
  * @param {object} obj 
  */
 export function param(obj) {
-  var arr = Object.keys(obj).map(function (k) {
+  const arr = Object.keys(obj).map(function (k) {
     return k + '=' + encodeURIComponent(obj[k])
   })
   return arr.join('&').replace(/%20/g, '+')
@@ -29,9 +29,9 @@ export function param(obj) {
 export function getQueryObject() {
   return (function(a) {
     if (a == '') return {};
-    var b = {};
-    for (var i = 0; i < a.length; ++i) {
-      var p = a[i].split('=');
+    const b = {};
+    for (const i = 0; i < a.length; ++i) {
+      const p = a[i].split('=');
       if (p.length != 2) continue;
       b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, ' '));
     }
@@ -48,8 +48,8 @@ export function getQueryObject() {
 export function getQueryValue(name, url) {
   if (!url) url = window.location.href;
   name = name.replace(/[\[\]]/g, "\\$&");
-  var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-      results = regex.exec(url);
+  const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+  const results = regex.exec(url);
   if (!results) return null;
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, " "));
@@ -90,5 +90,5 @@ export function asyncFunc(func) {
  *   delay(500).then(() => console.log('after 500ms'))
  */
 export function delay(time = 0) {
-  return new Promise((res, rej) => setTimeout(res, time));
+  return new Promise((res) => setTimeout(res, time));
 }

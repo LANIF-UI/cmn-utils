@@ -1,5 +1,5 @@
 import EventEmitter from 'wolfy87-eventemitter';
-import {isFunction, isArray} from '../utils';
+import { isFunction, isArray } from '../utils';
 
 export const eventEmitter = new EventEmitter();
 
@@ -18,7 +18,7 @@ export const on = (eventName, callbacks) => {
   } else if (isArray(callbacks)) {
     eventEmitter.addListeners(eventName, callbacks);
   } else {
-    console.error("类型错误： ", callbacks);
+    console.error('类型错误： ', callbacks);
   }
 };
 
@@ -31,7 +31,7 @@ export const once = (eventName, callback) => {
   if (isFunction(callback)) {
     eventEmitter.addOnceListener(eventName, callback);
   } else {
-    console.error("类型错误： ", callback);
+    console.error('类型错误： ', callback);
   }
 };
 
@@ -46,7 +46,7 @@ export const off = (eventName, callbacks) => {
   } else if (isArray(callbacks)) {
     eventEmitter.removeListeners(eventName, callbacks);
   } else {
-    console.error("类型错误： ", callbacks);
+    console.error('类型错误： ', callbacks);
   }
 };
 
