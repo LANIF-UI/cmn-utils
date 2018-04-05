@@ -270,9 +270,9 @@ export default class Request {
     return fetch(prefix + url, { headers: newheaders, ...fetchOpts })
       .then(resp => this.__checkStatus(resp))
       .then(resp => this.__parseResponse(resp, responseType))
-      .then(resp => this.__afterResponse(resp, afterResponse))
+      .then(resp => this.__afterResponse(resp, afterResponse, {prefix, url, ...fetchOpts}))
       .then(response => resolve(response))
-      .catch(e => this.__errorHandle(e, errorHandle, reject));
+      .catch(e => this.__errorHandle(e, errorHandle, reject, {prefix, url, ...fetchOpts}));
   })
 
   __checkStatus(response) {
@@ -292,21 +292,21 @@ export default class Request {
     return isFunction(response && response[responseType]) ? response[responseType]() : response;
   }
 
-  __afterResponse(response, afterResponse) {
+  __afterResponse(response, afterResponse, info) {
     if (isFunction(afterResponse)) {
-      const after = afterResponse(response);
+      const after = afterResponse(response, info);
       return after;
     }
 
     return response;
   }
 
-  __errorHandle(e, errorHandle, reject) {
+  __errorHandle(e, errorHandle, reject, info) {
     if (e.name !== 'RequestError') {
       e.name = 'RequestError';
       e.code = 0;
     }
-    if (!isFunction(errorHandle) || errorHandle(e) !== false) {
+    if (!isFunction(errorHandle) || errorHandle(e, info) !== false) {
       reject(e);
     }
   }
