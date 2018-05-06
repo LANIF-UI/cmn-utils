@@ -32,16 +32,17 @@ export default class Store {
   }
 
   /**
-   * 从本地缓存中异步获取指定 key 对应的内容
+   * 从本地缓存中异步获取指定 key 对应的内容, 如指定alt当没找到时反回alt
    * @param {string} key 
    * @return {Promise}
    */
-  getStoreAsync = (key) => Promise.resolve(this.store.get(key))
+  getStoreAsync = (key, alt) => Promise.resolve(this.store.get(key, alt))
   /**
-   * 从本地缓存中同步获取指定 key 对应的内容
+   * 从本地缓存中同步获取指定 key 对应的内容, 如指定alt当没找到时反回alt
    * @param {string} key 
+   * @param {any} alt
    */
-  getStore = (key) => this.store.get(key)
+  getStore = (key, alt) => this.store.get(key, alt)
 
   /**
    * 获取当前Store的所有key-value信息,放入一个对象中
