@@ -1,6 +1,7 @@
 import request from './request';
 import store from './store';
 import event, { on, once, off, trigger } from './event';
+import download from 'downloadjs';
 
 /**
  * 导出常用请求函数到全局，其它高级配置使用 '.request.xxx()' 
@@ -40,6 +41,8 @@ const L = {
   store, setStore, getStore, removeStore, clearStore,
   // event api
   event, on, once, off, trigger,
+  // download
+  download,
   // common utils
   ...require('./utils'),
 }

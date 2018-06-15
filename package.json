@@ -1,6 +1,6 @@
 {
   "name": "cmn-utils",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "common func & req",
   "keywords": [
     "react",
@@ -45,6 +45,7 @@
     "react-dom": "^16.2.0"
   },
   "dependencies": {
+    "downloadjs": "^1.4.7",
     "store2": "^2.5.9",
     "whatwg-fetch": "^2.0.3",
     "wolfy87-eventemitter": "^5.2.4"
