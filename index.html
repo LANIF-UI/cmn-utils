@@ -7,7 +7,7 @@
   <meta charset="utf-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css" rel="stylesheet"/>
-  <title>cmn-utils@0.1.5 - common func &amp; req</title>
+  <title>cmn-utils@1.0.3 - common func &amp; req</title>
   <style>
     @font-face {
       font-family: octicons-anchor;
@@ -737,7 +737,7 @@
 
 <body>
 <div class="header">
-  <h1>cmn-utils@0.1.5</h1>
+  <h1>cmn-utils@1.0.3</h1>
 </div>
 <div class="examples">
   <h3>EXAMPLES</h3>
@@ -762,6 +762,7 @@
 <li><a href="#event" title="Event">Event</a></li>
 <li><a href="#ui" title="UI">UI</a></li>
 <li><a href="#utils" title="Utils">Utils</a></li>
+<li><a href="#download" title="Download">Download</a></li>
 </ul>
 <h1>Request<a id="user-content-request" name="request" class="anchor" aria-hidden="true" href="#request"><span class="octicon octicon-link"></span></a></h1><p>简单包装的Fetch</p>
 <h2>API<a id="user-content-api" name="api" class="anchor" aria-hidden="true" href="#api"><span class="octicon octicon-link"></span></a></h2><ul>
@@ -909,7 +910,28 @@ $$.off(<span class="hljs-string">'eventName'</span>);
 
 $$.once(<span class="hljs-string">'eventName'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
   <span class="hljs-built_in">console</span>.log(value)
-});</code></pre></div>
+});</code></pre></div><h1>Download<a id="user-content-download" name="download" class="anchor" aria-hidden="true" href="#download"><span class="octicon octicon-link"></span></a></h1><p>下载文件 <code>download(data, strFileName, strMimeType);</code></p>
+<h4>示例<a id="user-content-示例" name="示例" class="anchor" aria-hidden="true" href="#示例"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="javascript">download(<span class="hljs-string">"hello world"</span>, <span class="hljs-string">"dlText.txt"</span>, <span class="hljs-string">"text/plain"</span>);
+
+download(<span class="hljs-string">"data:text/plain,hello%20world"</span>, <span class="hljs-string">"dlDataUrlText.txt"</span>, <span class="hljs-string">"text/plain"</span>);
+
+download(<span class="hljs-keyword">new</span> Blob([<span class="hljs-string">"hello world"</span>]), <span class="hljs-string">"dlTextBlob.txt"</span>, <span class="hljs-string">"text/plain"</span>);
+
+download(<span class="hljs-string">"/robots.txt"</span>);
+
+<span class="hljs-keyword">var</span> str= <span class="hljs-string">"hello world"</span>,    arr= <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>(str.length);
+str.split(<span class="hljs-string">""</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">a,b</span>)</span>{
+  arr[b]=a.charCodeAt();
+});
+download( arr, <span class="hljs-string">"textUInt8Array.txt"</span>, <span class="hljs-string">"text/plain"</span> );
+
+download(<span class="hljs-string">"/diff6.png"</span>);
+
+<span class="hljs-keyword">var</span> x=<span class="hljs-keyword">new</span> XMLHttpRequest();
+x.open( <span class="hljs-string">"GET"</span>, <span class="hljs-string">"/diff6.png"</span> , <span class="hljs-literal">true</span>);
+x.responseType=<span class="hljs-string">"blob"</span>;
+x.onload= <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{download(e.target.response, <span class="hljs-string">"awesomesauce.png"</span>, <span class="hljs-string">"image/png"</span>);};
+x.send();</code></pre></div>
   </div>
 </div>
 <a href=""><img style="position: absolute; top: 0; right: 0; border: 0;"

@@ -609,17 +609,21 @@ exports.f = {}.propertyIsEnumerable;
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["randomStr"] = randomStr;
 /* harmony export (immutable) */ __webpack_exports__["param"] = param;
+/* harmony export (immutable) */ __webpack_exports__["getQueryObject"] = getQueryObject;
+/* harmony export (immutable) */ __webpack_exports__["getQueryValue"] = getQueryValue;
 /* harmony export (immutable) */ __webpack_exports__["isArray"] = isArray;
 /* harmony export (immutable) */ __webpack_exports__["isFunction"] = isFunction;
 /* harmony export (immutable) */ __webpack_exports__["isObject"] = isObject;
 /* harmony export (immutable) */ __webpack_exports__["asyncFunc"] = asyncFunc;
 /* harmony export (immutable) */ __webpack_exports__["delay"] = delay;
+/* harmony export (immutable) */ __webpack_exports__["throttle"] = throttle;
+/* harmony export (immutable) */ __webpack_exports__["debounce"] = debounce;
 /**
   * 生成指定位数的随机数
   * @param {int} x 
   */
 function randomStr(x) {
-  var s = "";
+  var s = '';
   while (s.length < x && x > 0) {
     var v = Math.random() < 0.5 ? 32 : 0;
     s += String.fromCharCode(Math.round(Math.random() * (122 - v - (97 - v)) + (97 - v)));
@@ -636,6 +640,39 @@ function param(obj) {
     return k + '=' + encodeURIComponent(obj[k]);
   });
   return arr.join('&').replace(/%20/g, '+');
+}
+
+/**
+ * 查询字符串转为对象
+ * @return {object} {key1: value1, key2: value2}
+ */
+function getQueryObject() {
+  return function (a) {
+    if (a == '') return {};
+    var b = {};
+    for (var i = 0; i < a.length; ++i) {
+      var p = a[i].split('=');
+      if (p.length != 2) continue;
+      b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, ' '));
+    }
+    return b;
+  }(window.location.search.slice(1).split('&'));
+}
+
+/**
+ * 取查询字符串中某一个name的value
+ * @param {string} name 
+ * @param {string} url
+ * @return {string}
+ */
+function getQueryValue(name, url) {
+  if (!url) url = window.location.href;
+  name = name.replace(/[\[\]]/g, "\\$&");
+  var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+  var results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
 /**
@@ -681,9 +718,90 @@ function asyncFunc(func) {
 function delay() {
   var time = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-  return new Promise(function (res, rej) {
+  return new Promise(function (res) {
     return setTimeout(res, time);
   });
+}
+
+/**
+ * 创建并返回一个像节流阀一样的函数，当重复调用函数的时候，最多每隔 wait毫秒调用一次该函数
+ * @param func 执行函数
+ * @param wait 时间间隔
+ * @param options 如果你想禁用第一次首先执行的话，传递{leading: false}，
+ *                如果你想禁用最后一次执行的话，传递{trailing: false}
+ * @returns {Function}
+ */
+function throttle(func, wait, options) {
+  var context, args, result;
+  var timeout = null;
+  var previous = 0;
+  if (!options) options = {};
+  var later = function later() {
+    previous = options.leading === false ? 0 : new Date().getTime();
+    timeout = null;
+    result = func.apply(context, args);
+    if (!timeout) context = args = null;
+  };
+  return function () {
+    var now = new Date().getTime();
+    if (!previous && options.leading === false) previous = now;
+    var remaining = wait - (now - previous);
+    context = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      previous = now;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    } else if (!timeout && options.trailing !== false) {
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+}
+
+/**
+ * 防反跳。func函数在最后一次调用时刻的wait毫秒之后执行！
+ * @param func 执行函数
+ * @param wait 时间间隔
+ * @param immediate 为true，debounce会在wai 时间间隔的开始调用这个函数
+ * @returns {Function}
+ */
+function debounce(func, wait, immediate) {
+  var timeout, args, context, timestamp, result;
+
+  var later = function later() {
+    var last = new Date().getTime() - timestamp; // timestamp会实时更新
+
+    if (last < wait && last >= 0) {
+      timeout = setTimeout(later, wait - last);
+    } else {
+      timeout = null;
+      if (!immediate) {
+        result = func.apply(context, args);
+        if (!timeout) context = args = null;
+      }
+    }
+  };
+
+  return function () {
+    context = this;
+    args = arguments;
+    timestamp = new Date().getTime();
+    var callNow = immediate && !timeout;
+
+    if (!timeout) {
+      timeout = setTimeout(later, wait);
+    }
+    if (callNow) {
+      result = func.apply(context, args);
+      context = args = null;
+    }
+    return result;
+  };
 }
 
 /***/ }),
@@ -1706,7 +1824,7 @@ __WEBPACK_IMPORTED_MODULE_2__src_index__["b" /* request */].afterResponse(functi
 
 var A = function A() {
   function set() {
-    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].setStore("name", "abc").setStore("multi", { ip: '0.0.0.0' }).setStore("age", 18).setStore({
+    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].setStore("name", "abc").setStore("multi", { ip: "0.0.0.0" }).setStore("age", 18).setStore({
       a: 1,
       b: 2,
       c: true
@@ -1729,75 +1847,89 @@ var A = function A() {
     console.log(all);
 
     __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* store */].getStoreInfoAsync(function (value) {
-      return console.log('async', value);
-    }).setStore('name', 'def');
+      return console.log("async", value);
+    }).setStore("name", "def");
   }
 
   function requestGet() {
-    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].get('11http://httpbin.org/post').then(function (resp) {
+    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].get("http://httpbin.org/get").then(function (resp) {
       return console.log(resp);
-    })['catch'](function (e) {
+    })["catch"](function (e) {
       return console.log(e);
     });
   }
 
+  function download() {
+    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].download("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAARASURBVHjaYvz//z8DMcC25rYAkPIFYhcg1gRiOSBmg0r/AuKHQHwdiPcA8ebDLaofiTEXIIAYCTkAaLE2kCoH4lAg5kCT/galudDEfwDxKiDuADrkOj7zAQIIpwOAFvMAqTYgzgJiZiD+DcQHQb4D4sNA/Bho+BuoWhEgJQvEdtBQAtGsQPwHiKcCcSVQ7Xds9gAEEFYHAA1UB1LroUENCt4ZQNwKNOQVkdElDqRqgDgNGk2ngdgfqP85ulqAAMJwAFCzPpDaBcRiQHwSiCOAGh8wkAGAZikBqRVAbAoKMSD2App1BVkNQAChOACoQQVIHQFikA+WAXEyUMMPBgoA0ExOIDUP5BGoI8yAZr6AyQMEENwBQIVcUB/rAPFyII4GKvzPQAUANJsRamY4EJ8AYkeYxwACiAlJXQvUcpAjkqhlOQhAzUoE4jNAbAHE1TA5gAAChwA00YHi5i8o4QE13GegAYBG8VVojlIFJUqAAIKFQBkQswDxdHItBxrOC8RMBELiDpCaBcTcQFwLEgMIIEab6lt8QPo5NK/LwPI2muGqQOotUO4dFjl5ILUSiM2B+D0QN0Ppp0D1u7GoF4MmRlAoSAAEEMjFPtCSbB82y6EgGIgPADXLYJFbA7UcBASBuA+Ip0ELJmyhACpLDkBDwQsggEAOcILKbcJXYgKxLhCfBToiGJqqYSFjgkX9PyC+hMe8jVDaCSCAQA7Qg3KO4NGwHloiikF9fBdo+URotsIGdgJ9egaPeTC79AECCJTwFKGcZ3g0gBz5CIhVoHyQnjw86u8QSLMwu5QAAggUAnzQ2us9Hg1vkSwnBpwjIA8y7yfIboAAYoLG7398BQ9Qbi+QagepI8JyUOreTYQ6kFmMAAEEcgCo4cAJjFNBAhpAjnhBhMGLsGVXNCAEbVt8BAggkANgBY80AU0nCaRsBqgDq4hwJMyuewABxIRkqA2BUuwLEHsAmYU4ouIrEAcR2WaA2XURIIBAuWAfqNoFYj9owwNbTWYFze+OQOwNTTfIAFSyhQAtP0VkIvWH0vsAAggUAlugbTsnaNMKW012HVrKKSD5/ge0aZYNxOrEWg4tih2gIbYNIIBgteFcUBUMxBOABhUy0BAA7ZoMpHKAeDbQrjSAAILVXl3QBmQmUIEiDS1XgbYTQaVqJ0gMIICYoMF8E0iBXMYOarkAFXLQwHJOaKuIDRrSd0HiAAGEXH9XQ1uvoJptHqzCoWKTbD40IYOaZPUwOYAAQm+UCkPzuzIQbwXiKKBLP1FoOR/U517QOsICaOZbmDxAADGhpXiQRAC04gFlt11AAxQosFwJ2lXzgnbdApAtBwGAAMLVMYFVu7ZU6pgcgpYTr9HVAgQQvq4ZG7StCOoX8pDZNQOVFR2gLh5Q7W9s9gAEEDGdU0loOy+axM4pKN4bgRY/xGc+QAAxUtg9h5Wcb8jtngMEGABphoApdIiovgAAAABJRU5ErkJggg==", "aaa");
+  }
+
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-    'div',
+    "div",
     { style: { marginBottom: 400 } },
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'h1',
+      "h1",
       null,
-      'Store:'
+      "Store:"
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'button',
+      "button",
       { onClick: set },
-      '\u5B58'
+      "\u5B58"
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'button',
+      "button",
       { onClick: get },
-      '\u53D6'
+      "\u53D6"
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'button',
+      "button",
       { onClick: getAsync },
-      '\u5F02\u6B65\u53D6'
+      "\u5F02\u6B65\u53D6"
     ),
-    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("br", null),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'button',
+      "button",
       { onClick: getStore },
-      '\u83B7\u53D6\u5168\u90E8store'
+      "\u83B7\u53D6\u5168\u90E8store"
     ),
-    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('br', null),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("br", null),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'button',
+      "button",
       { onClick: function onClick(e) {
-          return __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].removeStore('name');
+          return __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].removeStore("name");
         } },
-      '\u5220\u9664'
+      "\u5220\u9664"
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'button',
+      "button",
       { onClick: function onClick(e) {
           return __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].clearStore();
         } },
-      '\u6E05\u7A7A'
+      "\u6E05\u7A7A"
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'h1',
+      "h1",
       null,
-      'Request'
+      "Request"
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'button',
+      "button",
       { onClick: requestGet },
-      'get'
+      "get"
+    ),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "h1",
+      null,
+      "download"
+    ),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "button",
+      { onClick: download },
+      "download"
     )
   );
 };
-__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(A, null), document.getElementById('__react-content'));
+__WEBPACK_IMPORTED_MODULE_1_react_dom___default.a.render(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(A, null), document.getElementById("__react-content"));
 
 /***/ }),
 /* 60 */
@@ -19117,8 +19249,11 @@ module.exports = camelize;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__request__ = __webpack_require__(81);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__store__ = __webpack_require__(117);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__event__ = __webpack_require__(120);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_downloadjs__ = __webpack_require__(122);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_downloadjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_downloadjs__);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__request__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_2__store__["a"]; });
+
 
 
 
@@ -19161,7 +19296,9 @@ var L = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_extends___default()({
   // store api
   store: __WEBPACK_IMPORTED_MODULE_2__store__["a" /* default */], setStore: setStore, getStore: getStore, removeStore: removeStore, clearStore: clearStore,
   // event api
-  event: __WEBPACK_IMPORTED_MODULE_3__event__["a" /* default */], on: __WEBPACK_IMPORTED_MODULE_3__event__["c" /* on */], once: __WEBPACK_IMPORTED_MODULE_3__event__["d" /* once */], off: __WEBPACK_IMPORTED_MODULE_3__event__["b" /* off */], trigger: __WEBPACK_IMPORTED_MODULE_3__event__["e" /* trigger */]
+  event: __WEBPACK_IMPORTED_MODULE_3__event__["a" /* default */], on: __WEBPACK_IMPORTED_MODULE_3__event__["c" /* on */], once: __WEBPACK_IMPORTED_MODULE_3__event__["d" /* once */], off: __WEBPACK_IMPORTED_MODULE_3__event__["b" /* off */], trigger: __WEBPACK_IMPORTED_MODULE_3__event__["e" /* trigger */],
+  // download
+  download: __WEBPACK_IMPORTED_MODULE_4_downloadjs___default.a
 }, __webpack_require__(20));
 
 if (L.__esModule) delete L.__esModule;
@@ -19358,10 +19495,10 @@ var Request = function () {
 
     REQUEST_METHODS.forEach(function (method) {
       _this[method.toLowerCase()] = function (url, data) {
-        var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-        opts.data = data;
-        return _this.send(url, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, opts, { method: method }));
+        options.data = data;
+        return _this.send(url, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, options, { method: method }));
       };
     });
   }
@@ -19420,7 +19557,7 @@ var Request = function () {
 
   Request.prototype.__checkStatus = function __checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
-      if (response.status == 204) {
+      if (response.status === 204) {
         return null;
       }
       return response;
@@ -19435,27 +19572,21 @@ var Request = function () {
     return Object(__WEBPACK_IMPORTED_MODULE_3__utils__["isFunction"])(response && response[responseType]) ? response[responseType]() : response;
   };
 
-  Request.prototype.__afterResponse = function __afterResponse(response, afterResponse) {
+  Request.prototype.__afterResponse = function __afterResponse(response, afterResponse, info) {
     if (Object(__WEBPACK_IMPORTED_MODULE_3__utils__["isFunction"])(afterResponse)) {
-      var after = afterResponse(response);
-      if (after && after.then) {
-        after.then(function (afterResp) {
-          return afterResp;
-        });
-      } else {
-        return after;
-      }
-    } else {
-      return response;
+      var after = afterResponse(response, info);
+      return after;
     }
+
+    return response;
   };
 
-  Request.prototype.__errorHandle = function __errorHandle(e, errorHandle, reject) {
+  Request.prototype.__errorHandle = function __errorHandle(e, errorHandle, reject, info) {
     if (e.name !== 'RequestError') {
       e.name = 'RequestError';
       e.code = 0;
     }
-    if (!Object(__WEBPACK_IMPORTED_MODULE_3__utils__["isFunction"])(errorHandle) || errorHandle(e) !== false) {
+    if (!Object(__WEBPACK_IMPORTED_MODULE_3__utils__["isFunction"])(errorHandle) || errorHandle(e, info) !== false) {
       reject(e);
     }
   };
@@ -19596,25 +19727,27 @@ var _initialiseProps = function _initialiseProps() {
     return body;
   };
 
-  this.getform = function (url) {
-    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  this.getform = function (url, data) {
+    var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
+    opts.data = data;
     return _this2.send(url, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, opts, {
       method: 'GET',
-      headers: {
+      headers: __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, _this2._options.headers, opts.headers, {
         'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      }
+      })
     }));
   };
 
-  this.postform = function (url) {
-    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  this.postform = function (url, data) {
+    var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
+    opts.data = data;
     return _this2.send(url, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, opts, {
       method: 'POST',
-      headers: {
+      headers: __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, _this2._options.headers, opts.headers, {
         'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      }
+      })
     }));
   };
 
@@ -19630,10 +19763,6 @@ var _initialiseProps = function _initialiseProps() {
 
       var options = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, _this2._options, otherOpts);
 
-      if (Object(__WEBPACK_IMPORTED_MODULE_3__utils__["isFunction"])(beforeRequest) && beforeRequest(url, options) === false) {
-        return reject(new __WEBPACK_IMPORTED_MODULE_4__error__["a" /* default */]('request canceled by beforeRequest', 'requestCanceled'));
-      }
-
       var beforeRequest = options.beforeRequest,
           afterResponse = options.afterResponse,
           errorHandle = options.errorHandle,
@@ -19641,6 +19770,10 @@ var _initialiseProps = function _initialiseProps() {
           prefix = options.prefix,
           headers = options.headers,
           fetchOpts = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_objectWithoutProperties___default()(options, ['beforeRequest', 'afterResponse', 'errorHandle', 'responseType', 'prefix', 'headers']);
+
+      if (Object(__WEBPACK_IMPORTED_MODULE_3__utils__["isFunction"])(beforeRequest) && beforeRequest(url, options) === false) {
+        return reject(new __WEBPACK_IMPORTED_MODULE_4__error__["a" /* default */]('request canceled by beforeRequest', 'requestCanceled'));
+      }
 
       var __headersFun__ = headers.__headersFun__,
           realheaders = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_objectWithoutProperties___default()(headers, ['__headersFun__']);
@@ -19680,11 +19813,11 @@ var _initialiseProps = function _initialiseProps() {
       }).then(function (resp) {
         return _this2.__parseResponse(resp, responseType);
       }).then(function (resp) {
-        return _this2.__afterResponse(resp, afterResponse);
+        return _this2.__afterResponse(resp, afterResponse, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({ prefix: prefix, url: url }, fetchOpts));
       }).then(function (response) {
         return resolve(response);
       })['catch'](function (e) {
-        return _this2.__errorHandle(e, errorHandle, reject);
+        return _this2.__errorHandle(e, errorHandle, reject, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({ prefix: prefix, url: url }, fetchOpts));
       });
     });
   };
@@ -19741,8 +19874,8 @@ var codeMessage = {
   503: '服务不可用，服务器暂时过载或维护',
   504: '网关超时',
   0: '请求错误',
-  'invalidURL': '无效的请求URL',
-  'requestCanceled': '请求被提前取消了'
+  invalidURL: '无效的请求URL',
+  requestCanceled: '请求被提前取消了'
 };
 
 var RequestError = function (_Error) {
@@ -21011,10 +21144,9 @@ var Store = function Store(namespace) {
 
   _initialiseProps.call(this);
 
-  if (namespace) __WEBPACK_IMPORTED_MODULE_1_store2___default.a.namespace;
-
-  this.session = __WEBPACK_IMPORTED_MODULE_1_store2___default.a.session;
-  this.local = __WEBPACK_IMPORTED_MODULE_1_store2___default.a.local;
+  this.store = namespace ? __WEBPACK_IMPORTED_MODULE_1_store2___default.a.namespace(namespace) : __WEBPACK_IMPORTED_MODULE_1_store2___default.a;
+  this.session = this.store.session;
+  this.local = this.store.local;
 }
 
 /**
@@ -21034,15 +21166,15 @@ var Store = function Store(namespace) {
 
 
 /**
- * 从本地缓存中异步获取指定 key 对应的内容
+ * 从本地缓存中异步获取指定 key 对应的内容, 如指定alt当没找到时反回alt
  * @param {string} key 
  * @return {Promise}
  */
 
-
 /**
- * 从本地缓存中同步获取指定 key 对应的内容
+ * 从本地缓存中同步获取指定 key 对应的内容, 如指定alt当没找到时反回alt
  * @param {string} key 
+ * @param {any} alt
  */
 
 
@@ -21082,37 +21214,37 @@ var _initialiseProps = function _initialiseProps() {
 
   this.setStore = function (key, value) {
     if (Object(__WEBPACK_IMPORTED_MODULE_2__utils__["isObject"])(key)) {
-      __WEBPACK_IMPORTED_MODULE_1_store2___default.a.setAll(key);
+      _this.store.setAll(key);
     } else {
-      __WEBPACK_IMPORTED_MODULE_1_store2___default.a.set(key, value);
+      _this.store.set(key, value);
     }
     return _this;
   };
 
-  this.getStoreAsync = function (key) {
-    return Promise.resolve(__WEBPACK_IMPORTED_MODULE_1_store2___default.a.get(key));
+  this.getStoreAsync = function (key, alt) {
+    return Promise.resolve(_this.store.get(key, alt));
   };
 
-  this.getStore = function (key) {
-    return __WEBPACK_IMPORTED_MODULE_1_store2___default.a.get(key);
+  this.getStore = function (key, alt) {
+    return _this.store.get(key, alt);
   };
 
   this.getStoreInfo = function () {
-    return __WEBPACK_IMPORTED_MODULE_1_store2___default.a.getAll();
+    return _this.store.getAll();
   };
 
   this.getStoreInfoAsync = function (cb) {
-    if (Object(__WEBPACK_IMPORTED_MODULE_2__utils__["isFunction"])(cb)) cb(__WEBPACK_IMPORTED_MODULE_1_store2___default.a.getAll());
+    if (Object(__WEBPACK_IMPORTED_MODULE_2__utils__["isFunction"])(cb)) cb(_this.store.getAll());
     return _this;
   };
 
   this.removeStore = function (key) {
-    __WEBPACK_IMPORTED_MODULE_1_store2___default.a.remove(key);
+    _this.store.remove(key);
     return _this;
   };
 
   this.clearStore = function () {
-    __WEBPACK_IMPORTED_MODULE_1_store2___default.a.clearAll();
+    _this.store.clearAll();
     return _this;
   };
 
@@ -21398,7 +21530,7 @@ var on = function on(eventName, callbacks) {
   } else if (Object(__WEBPACK_IMPORTED_MODULE_1__utils__["isArray"])(callbacks)) {
     eventEmitter.addListeners(eventName, callbacks);
   } else {
-    console.error("类型错误： ", callbacks);
+    console.error('类型错误： ', callbacks);
   }
 };
 
@@ -21411,7 +21543,7 @@ var once = function once(eventName, callback) {
   if (Object(__WEBPACK_IMPORTED_MODULE_1__utils__["isFunction"])(callback)) {
     eventEmitter.addOnceListener(eventName, callback);
   } else {
-    console.error("类型错误： ", callback);
+    console.error('类型错误： ', callback);
   }
 };
 
@@ -21426,7 +21558,7 @@ var off = function off(eventName, callbacks) {
   } else if (Object(__WEBPACK_IMPORTED_MODULE_1__utils__["isArray"])(callbacks)) {
     eventEmitter.removeListeners(eventName, callbacks);
   } else {
-    console.error("类型错误： ", callbacks);
+    console.error('类型错误： ', callbacks);
   }
 };
 
@@ -21934,6 +22066,182 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*!
         exports.EventEmitter = EventEmitter;
     }
 }(this || {}));
+
+
+/***/ }),
+/* 122 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//download.js v4.2, by dandavis; 2008-2016. [MIT] see http://danml.com/download.html for tests/usage
+// v1 landed a FF+Chrome compat way of downloading strings to local un-named files, upgraded to use a hidden frame and optional mime
+// v2 added named files via a[download], msSaveBlob, IE (10+) support, and window.URL support for larger+faster saves than dataURLs
+// v3 added dataURL and Blob Input, bind-toggle arity, and legacy dataURL fallback was improved with force-download mime and base64 support. 3.1 improved safari handling.
+// v4 adds AMD/UMD, commonJS, and plain browser support
+// v4.1 adds url download capability via solo URL argument (same domain/CORS only)
+// v4.2 adds semantic variable names, long (over 2MB) dataURL support, and hidden by default temp anchors
+// https://github.com/rndme/download
+
+(function (root, factory) {
+	if (true) {
+		// AMD. Register as an anonymous module.
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	} else if (typeof exports === 'object') {
+		// Node. Does not work with strict CommonJS, but
+		// only CommonJS-like environments that support module.exports,
+		// like Node.
+		module.exports = factory();
+	} else {
+		// Browser globals (root is window)
+		root.download = factory();
+  }
+}(this, function () {
+
+	return function download(data, strFileName, strMimeType) {
+
+		var self = window, // this script is only for browsers anyway...
+			defaultMime = "application/octet-stream", // this default mime also triggers iframe downloads
+			mimeType = strMimeType || defaultMime,
+			payload = data,
+			url = !strFileName && !strMimeType && payload,
+			anchor = document.createElement("a"),
+			toString = function(a){return String(a);},
+			myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString),
+			fileName = strFileName || "download",
+			blob,
+			reader;
+			myBlob= myBlob.call ? myBlob.bind(self) : Blob ;
+	  
+		if(String(this)==="true"){ //reverse arguments, allowing download.bind(true, "text/xml", "export.xml") to act as a callback
+			payload=[payload, mimeType];
+			mimeType=payload[0];
+			payload=payload[1];
+		}
+
+
+		if(url && url.length< 2048){ // if no filename and no mime, assume a url was passed as the only argument
+			fileName = url.split("/").pop().split("?")[0];
+			anchor.href = url; // assign href prop to temp anchor
+		  	if(anchor.href.indexOf(url) !== -1){ // if the browser determines that it's a potentially valid url path:
+        		var ajax=new XMLHttpRequest();
+        		ajax.open( "GET", url, true);
+        		ajax.responseType = 'blob';
+        		ajax.onload= function(e){ 
+				  download(e.target.response, fileName, defaultMime);
+				};
+        		setTimeout(function(){ ajax.send();}, 0); // allows setting custom ajax headers using the return:
+			    return ajax;
+			} // end if valid url?
+		} // end if url?
+
+
+		//go ahead and download dataURLs right away
+		if(/^data:([\w+-]+\/[\w+.-]+)?[,;]/.test(payload)){
+		
+			if(payload.length > (1024*1024*1.999) && myBlob !== toString ){
+				payload=dataUrlToBlob(payload);
+				mimeType=payload.type || defaultMime;
+			}else{			
+				return navigator.msSaveBlob ?  // IE10 can't do a[download], only Blobs:
+					navigator.msSaveBlob(dataUrlToBlob(payload), fileName) :
+					saver(payload) ; // everyone else can save dataURLs un-processed
+			}
+			
+		}else{//not data url, is it a string with special needs?
+			if(/([\x80-\xff])/.test(payload)){			  
+				var i=0, tempUiArr= new Uint8Array(payload.length), mx=tempUiArr.length;
+				for(i;i<mx;++i) tempUiArr[i]= payload.charCodeAt(i);
+			 	payload=new myBlob([tempUiArr], {type: mimeType});
+			}		  
+		}
+		blob = payload instanceof myBlob ?
+			payload :
+			new myBlob([payload], {type: mimeType}) ;
+
+
+		function dataUrlToBlob(strUrl) {
+			var parts= strUrl.split(/[:;,]/),
+			type= parts[1],
+			decoder= parts[2] == "base64" ? atob : decodeURIComponent,
+			binData= decoder( parts.pop() ),
+			mx= binData.length,
+			i= 0,
+			uiArr= new Uint8Array(mx);
+
+			for(i;i<mx;++i) uiArr[i]= binData.charCodeAt(i);
+
+			return new myBlob([uiArr], {type: type});
+		 }
+
+		function saver(url, winMode){
+
+			if ('download' in anchor) { //html5 A[download]
+				anchor.href = url;
+				anchor.setAttribute("download", fileName);
+				anchor.className = "download-js-link";
+				anchor.innerHTML = "downloading...";
+				anchor.style.display = "none";
+				document.body.appendChild(anchor);
+				setTimeout(function() {
+					anchor.click();
+					document.body.removeChild(anchor);
+					if(winMode===true){setTimeout(function(){ self.URL.revokeObjectURL(anchor.href);}, 250 );}
+				}, 66);
+				return true;
+			}
+
+			// handle non-a[download] safari as best we can:
+			if(/(Version)\/(\d+)\.(\d+)(?:\.(\d+))?.*Safari\//.test(navigator.userAgent)) {
+				if(/^data:/.test(url))	url="data:"+url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
+				if(!window.open(url)){ // popup blocked, offer direct download:
+					if(confirm("Displaying New Document\n\nUse Save As... to download, then click back to return to this page.")){ location.href=url; }
+				}
+				return true;
+			}
+
+			//do iframe dataURL download (old ch+FF):
+			var f = document.createElement("iframe");
+			document.body.appendChild(f);
+
+			if(!winMode && /^data:/.test(url)){ // force a mime that will download:
+				url="data:"+url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
+			}
+			f.src=url;
+			setTimeout(function(){ document.body.removeChild(f); }, 333);
+
+		}//end saver
+
+
+
+
+		if (navigator.msSaveBlob) { // IE10+ : (has Blob, but not a[download] or URL)
+			return navigator.msSaveBlob(blob, fileName);
+		}
+
+		if(self.URL){ // simple fast and modern way using Blob and URL:
+			saver(self.URL.createObjectURL(blob), true);
+		}else{
+			// handle non-Blob()+non-URL browsers:
+			if(typeof blob === "string" || blob.constructor===toString ){
+				try{
+					return saver( "data:" +  mimeType   + ";base64,"  +  self.btoa(blob)  );
+				}catch(y){
+					return saver( "data:" +  mimeType   + "," + encodeURIComponent(blob)  );
+				}
+			}
+
+			// Blob but not URL support:
+			reader=new FileReader();
+			reader.onload=function(e){
+				saver(this.result);
+			};
+			reader.readAsDataURL(blob);
+		}
+		return true;
+	}; /* end download() */
+}));
 
 
 /***/ })
