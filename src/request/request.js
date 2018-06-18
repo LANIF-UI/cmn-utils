@@ -269,7 +269,12 @@ export default class Request {
       delete fetchOpts.body;
     }
 
-    return fetch(prefix + url, { headers: newheaders, ...fetchOpts })
+    const nextURL = prefix + url;
+    if (/^(http|https|ftp)\:\/\//.test(url)) {
+      nextURL = url;
+    }
+    
+    return fetch(nextURL, { headers: newheaders, ...fetchOpts })
       .then(resp => this.__checkStatus(resp))
       .then(resp => this.__parseResponse(resp, responseType))
       .then(resp => this.__afterResponse(resp, afterResponse, {prefix, url, ...fetchOpts}))
