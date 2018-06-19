@@ -17,6 +17,7 @@ const post           = request.post;
 const head           = request.head;
 const del            = request.delete;
 const put            = request.put;
+const jsonp          = request.jsonp;
 
 export { request };
 
@@ -36,7 +37,7 @@ export { store };
  */
 const L = {
   // request api
-  request, requestConfig, requestHeaders, getform, postform, send, get, post, head, del, put,
+  request, requestConfig, requestHeaders, getform, postform, send, get, post, head, del, put, jsonp,
   // store api
   store, setStore, getStore, removeStore, clearStore,
   // event api

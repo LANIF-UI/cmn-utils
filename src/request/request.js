@@ -269,7 +269,7 @@ export default class Request {
       delete fetchOpts.body;
     }
 
-    const nextURL = prefix + url;
+    let nextURL = prefix + url;
     if (/^(http|https|ftp)\:\/\//.test(url)) {
       nextURL = url;
     }

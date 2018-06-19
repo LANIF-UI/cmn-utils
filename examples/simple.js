@@ -56,6 +56,12 @@ const A = () => {
     );
   }
 
+  function jsonp() {
+    $$.jsonp('https://alibaba.github.io/BizCharts/public/data/world.geo.json').then(resp => {
+      console.log(resp);
+    })
+  }
+
   return (
     <div style={{ marginBottom: 400 }}>
       <h1>Store:</h1>
@@ -71,6 +77,8 @@ const A = () => {
       <button onClick={requestGet}>get</button>
       <h1>download</h1>
       <button onClick={download}>download</button>
+      <h1>JSONP</h1>
+      <button onClick={jsonp}>JSONP</button>
     </div>
   );
 };
