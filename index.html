@@ -7,7 +7,7 @@
   <meta charset="utf-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css" rel="stylesheet"/>
-  <title>cmn-utils@1.0.3 - common func &amp; req</title>
+  <title>cmn-utils@1.0.4 - common func &amp; req</title>
   <style>
     @font-face {
       font-family: octicons-anchor;
@@ -737,7 +737,7 @@
 
 <body>
 <div class="header">
-  <h1>cmn-utils@1.0.3</h1>
+  <h1>cmn-utils@1.0.4</h1>
 </div>
 <div class="examples">
   <h3>EXAMPLES</h3>
@@ -770,6 +770,7 @@
 <li>requestHeaders 设置headers, 支持 object | key-value | function 类型参数</li>
 <li>send 发送请求</li>
 <li>getform, postform, get, post, head, del, put 发送请求(这些都是简化的send)</li>
+<li>支持jsonp</li>
 <li><em>下面为不在$$中的方法</em></li>
 <li>create 返回新实例</li>
 <li>config 同 requestConfig</li>
@@ -786,7 +787,8 @@ $$.send(<span class="hljs-string">'/send'</span>)
 $$.get(<span class="hljs-string">'/get/1'</span>)
 $$.post(<span class="hljs-string">'/post'</span>)
 $$.put(<span class="hljs-string">'/put'</span>)
-$$.del(<span class="hljs-string">'/put/1'</span>)</code></pre></div><h4>默认选项<a id="user-content-默认选项" name="默认选项" class="anchor" aria-hidden="true" href="#默认选项"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="js">{
+$$.del(<span class="hljs-string">'/put/1'</span>)
+$$.jsonp(<span class="hljs-string">'abc.jsonp'</span>).then(resp =&gt; resp.json())</code></pre></div><h4>默认选项<a id="user-content-默认选项" name="默认选项" class="anchor" aria-hidden="true" href="#默认选项"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="js">{
     method: <span class="hljs-string">'POST'</span>,         <span class="hljs-comment">// default 'POST'</span>
     mode: <span class="hljs-string">'cors'</span>,
     cache: <span class="hljs-string">'no-cache'</span>,

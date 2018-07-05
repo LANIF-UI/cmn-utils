@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>simple.js - example - cmn-utils@1.0.3</title>
+  <title>simple.js - example - cmn-utils@1.0.4</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -263,7 +263,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <body>
   <div class="container">
     <div class="header">
-      <h1>cmn-utils@1.0.3</h1>
+      <h1>cmn-utils@1.0.4</h1>
 
       <p>common func &amp; req</p>
     </div>
@@ -275,6 +275,9 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <span class="hljs-keyword">import</span> $$, { store, request } from <span class="hljs-string">"../src/index"</span>;
 
 request
+  .withHeaders(() =&gt; ({
+    token: <span class="hljs-string">'***mytoken***'</span> + <span class="hljs-built_in">Math</span>.random()
+  }))
   .afterResponse(resp =&gt; {
     <span class="hljs-keyword">return</span> resp;
   })
@@ -327,6 +330,12 @@ request
     );
   }
 
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">jsonp</span>(<span class="hljs-params"></span>) </span>{
+    $$.jsonp(<span class="hljs-string">'https://alibaba.github.io/BizCharts/public/data/world.geo.json'</span>).then(resp =&gt; {
+      <span class="hljs-built_in">console</span>.log(resp);
+    })
+  }
+
   <span class="hljs-keyword">return</span> (
     <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">style</span>=<span class="hljs-value">{{</span> <span class="hljs-attribute">marginBottom:</span> <span class="hljs-attribute">400</span> }}&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">h1</span>&gt;</span>Store:<span class="hljs-tag">&lt;/<span class="hljs-title">h1</span>&gt;</span>
@@ -342,6 +351,8 @@ request
       <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{requestGet}</span>&gt;</span>get<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">h1</span>&gt;</span>download<span class="hljs-tag">&lt;/<span class="hljs-title">h1</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{download}</span>&gt;</span>download<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">h1</span>&gt;</span>JSONP<span class="hljs-tag">&lt;/<span class="hljs-title">h1</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{jsonp}</span>&gt;</span>JSONP<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
   )</span>;
 };
