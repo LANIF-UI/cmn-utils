@@ -22,7 +22,7 @@ export default class Request {
     beforeRequest: null,    // before request check, return false or a rejected Promise will stop request
     afterResponse: null,    // after request hook
     errorHandle: null,      // global error handle
-    withHeaders: null,      // function, every request will take it
+    withHeaders: null,      // function & object, every request will take it
   }
 
   constructor(opts = {}) {
@@ -255,6 +255,8 @@ export default class Request {
       if (_newheaders && isObject(_newheaders)) {
         newheaders = { ...newheaders, ..._newheaders };
       }
+    } else if (isObject(withHeaders)) {
+      newheaders = { ...newheaders, ...withHeaders };
     }
 
     if (__headersFun__) {
