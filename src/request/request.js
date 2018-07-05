@@ -22,6 +22,7 @@ export default class Request {
     beforeRequest: null,    // before request check, return false or a rejected Promise will stop request
     afterResponse: null,    // after request hook
     errorHandle: null,      // global error handle
+    withHeaders: null,      // function, every request will take it
   }
 
   constructor(opts = {}) {
@@ -103,6 +104,14 @@ export default class Request {
     const options = this._options;
     if (isFunction(cb)) {
       options.errorHandle = cb;
+    }
+    return this;
+  }
+
+  withHeaders = (cb) => {
+    const options = this._options;
+    if (isFunction(cb)) {
+      options.withHeaders = cb;
     }
     return this;
   }
@@ -232,7 +241,7 @@ export default class Request {
 
     const options = { ...this._options, ...otherOpts };
 
-    const { beforeRequest, afterResponse, errorHandle, responseType, prefix, headers, ...fetchOpts } = options;
+    const { beforeRequest, afterResponse, errorHandle, responseType, prefix, headers, withHeaders, ...fetchOpts } = options;
 
     if (isFunction(beforeRequest) && beforeRequest(url, options) === false) {
       return reject(new RequestError('request canceled by beforeRequest', 'requestCanceled'));
@@ -240,10 +249,18 @@ export default class Request {
 
     const { __headersFun__, ...realheaders } = headers;
     let newheaders = { ...realheaders };
+
+    if (isFunction(withHeaders)) {
+      const _newheaders = withHeaders();
+      if (_newheaders && isObject(_newheaders)) {
+        newheaders = { ...newheaders, ..._newheaders };
+      }
+    }
+
     if (__headersFun__) {
       const _newheaders = __headersFun__();
       if (_newheaders && isObject(_newheaders)) {
-        newheaders = { ...realheaders, ..._newheaders };
+        newheaders = { ...newheaders, ..._newheaders };
       }
     }
 

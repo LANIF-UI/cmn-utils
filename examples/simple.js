@@ -4,6 +4,9 @@ import ReactDOM from "react-dom";
 import $$, { store, request } from "../src/index";
 
 request
+  .withHeaders(() => ({
+    token: '***mytoken***' + Math.random()
+  }))
   .afterResponse(resp => {
     return resp;
   })
