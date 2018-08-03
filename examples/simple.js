@@ -37,6 +37,14 @@ const A = () => {
       .then(value => console.log("异步值：", value));
   }
 
+  function concurrencyRequest() {
+    let r1 = $$.get("http://httpbin.org/get");
+    let r2 = $$.post("http://httpbin.org/post");
+    let r3 = $$.put("http://httpbin.org/put");
+
+    Promise.all([r1, r2, r3])
+  }
+
   function getStore() {
     const all = store.getStoreInfo();
     console.log(all);
@@ -71,6 +79,7 @@ const A = () => {
       <button onClick={set}>存</button>
       <button onClick={get}>取</button>
       <button onClick={getAsync}>异步取</button>
+      <button onClick={concurrencyRequest}>并发取</button>
       <br />
       <button onClick={getStore}>获取全部store</button>
       <br />

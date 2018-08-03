@@ -148,6 +148,18 @@ $$.post('http://httpbin.org/post', {name: 'weiq'}, {
   })
 ```
 
+#### 并发请求
+
+```js
+function concurrencyRequest() {
+  let r1 = $$.get("http://httpbin.org/get");
+  let r2 = $$.post("http://httpbin.org/post");
+  let r3 = $$.put("http://httpbin.org/put");
+
+  Promise.all([r1, r2, r3])
+}
+```
+
 # Store
 
 简单包装的store2
