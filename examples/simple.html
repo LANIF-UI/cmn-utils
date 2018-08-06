@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>simple.js - example - cmn-utils@1.0.4</title>
+  <title>simple.js - example - cmn-utils@1.0.5</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -263,7 +263,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <body>
   <div class="container">
     <div class="header">
-      <h1>cmn-utils@1.0.4</h1>
+      <h1>cmn-utils@1.0.5</h1>
 
       <p>common func &amp; req</p>
     </div>
@@ -308,6 +308,14 @@ request
       .then(value =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"异步值："</span>, value));
   }
 
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">concurrencyRequest</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">let</span> r1 = $$.get(<span class="hljs-string">"http://httpbin.org/get"</span>);
+    <span class="hljs-keyword">let</span> r2 = $$.post(<span class="hljs-string">"http://httpbin.org/post"</span>);
+    <span class="hljs-keyword">let</span> r3 = $$.put(<span class="hljs-string">"http://httpbin.org/put"</span>);
+
+    <span class="hljs-built_in">Promise</span>.all([r1, r2, r3])
+  }
+
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getStore</span>(<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">const</span> all = store.getStoreInfo();
     <span class="hljs-built_in">console</span>.log(all);
@@ -342,6 +350,7 @@ request
       <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{set}</span>&gt;</span>存<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{get}</span>&gt;</span>取<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{getAsync}</span>&gt;</span>异步取<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{concurrencyRequest}</span>&gt;</span>并发取<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">br</span> /&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{getStore}</span>&gt;</span>获取全部store<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">br</span> /&gt;</span>

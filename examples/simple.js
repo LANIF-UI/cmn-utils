@@ -635,11 +635,16 @@ function randomStr(x) {
  * 对像转成url查询字符串
  * @param {object} obj 
  */
-function param(obj) {
-  var arr = Object.keys(obj).map(function (k) {
-    return k + '=' + encodeURIComponent(obj[k]);
-  });
-  return arr.join('&').replace(/%20/g, '+');
+function param(obj, prefix) {
+  var str = [];
+  for (var p in obj) {
+    if (obj.hasOwnProperty(p)) {
+      var k = prefix ? prefix + "[" + p + "]" : p,
+          v = obj[p];
+      str.push(typeof v == "object" ? serialize(v, k) : encodeURIComponent(k) + "=" + encodeURIComponent(v));
+    }
+  }
+  return str.join("&");
 }
 
 /**
@@ -659,7 +664,7 @@ function getQueryObject() {
   }(window.location.search.slice(1).split('&'));
 }
 
-/**
+/** 
  * 取查询字符串中某一个name的value
  * @param {string} name 
  * @param {string} url
@@ -1846,6 +1851,14 @@ var A = function A() {
     });
   }
 
+  function concurrencyRequest() {
+    var r1 = __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].get("http://httpbin.org/get");
+    var r2 = __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].post("http://httpbin.org/post");
+    var r3 = __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].put("http://httpbin.org/put");
+
+    Promise.all([r1, r2, r3]);
+  }
+
   function getStore() {
     var all = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* store */].getStoreInfo();
     console.log(all);
@@ -1895,6 +1908,11 @@ var A = function A() {
       "button",
       { onClick: getAsync },
       "\u5F02\u6B65\u53D6"
+    ),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "button",
+      { onClick: concurrencyRequest },
+      "\u5E76\u53D1\u53D6"
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("br", null),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -19637,7 +19655,7 @@ var _initialiseProps = function _initialiseProps() {
     beforeRequest: null, // before request check, return false or a rejected Promise will stop request
     afterResponse: null, // after request hook
     errorHandle: null, // global error handle
-    withHeaders: null // function, every request will take it
+    withHeaders: null // function & object, every request will take it
   };
 
   this.create = function (opts) {
@@ -19822,6 +19840,8 @@ var _initialiseProps = function _initialiseProps() {
         if (_newheaders && Object(__WEBPACK_IMPORTED_MODULE_3__utils__["isObject"])(_newheaders)) {
           newheaders = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, newheaders, _newheaders);
         }
+      } else if (Object(__WEBPACK_IMPORTED_MODULE_3__utils__["isObject"])(withHeaders)) {
+        newheaders = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, newheaders, withHeaders);
       }
 
       if (__headersFun__) {
