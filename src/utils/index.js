@@ -21,7 +21,7 @@ export function param(obj, prefix) {
     if (obj.hasOwnProperty(p)) {
       const k = prefix ? prefix + "[" + p + "]" : p,
             v = obj[p];
-        str.push(typeof v == "object" ? serialize(v, k) : encodeURIComponent(k) + "=" + encodeURIComponent(v));
+        str.push(typeof v == "object" ? param(v, k) : encodeURIComponent(k) + "=" + encodeURIComponent(v));
     }
   }
   return str.join("&");
