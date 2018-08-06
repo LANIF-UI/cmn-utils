@@ -15,11 +15,16 @@ export function randomStr(x) {
  * 对像转成url查询字符串
  * @param {object} obj 
  */
-export function param(obj) {
-  const arr = Object.keys(obj).map(function (k) {
-    return k + '=' + encodeURIComponent(obj[k])
-  })
-  return arr.join('&').replace(/%20/g, '+')
+export function param(obj, prefix) {
+  const str = [];
+  for (const p in obj) {
+    if (obj.hasOwnProperty(p)) {
+      const k = prefix ? prefix + "[" + p + "]" : p,
+            v = obj[p];
+        str.push(typeof v == "object" ? serialize(v, k) : encodeURIComponent(k) + "=" + encodeURIComponent(v));
+    }
+  }
+  return str.join("&");
 }
 
 /**
@@ -39,7 +44,7 @@ export function getQueryObject() {
   })(window.location.search.slice(1).split('&'));
 }
 
-/**
+/** 
  * 取查询字符串中某一个name的value
  * @param {string} name 
  * @param {string} url
