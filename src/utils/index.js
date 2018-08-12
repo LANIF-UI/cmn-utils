@@ -21,7 +21,12 @@ export function param(obj, prefix) {
     if (obj.hasOwnProperty(p)) {
       const k = prefix ? prefix + "[" + p + "]" : p,
             v = obj[p];
-        str.push(typeof v == "object" ? param(v, k) : encodeURIComponent(k) + "=" + encodeURIComponent(v));
+      if(typeof v === "object") {
+        const rv = param(v, k);
+        if (rv) str.push(rv);
+      } else {
+        str.push(encodeURIComponent(k) + "=" + encodeURIComponent(v));
+      }
     }
   }
   return str.join("&");

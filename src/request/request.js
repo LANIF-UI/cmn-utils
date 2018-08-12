@@ -243,10 +243,6 @@ export default class Request {
 
     const { beforeRequest, afterResponse, errorHandle, responseType, prefix, headers, withHeaders, ...fetchOpts } = options;
 
-    if (isFunction(beforeRequest) && beforeRequest(url, options) === false) {
-      return reject(new RequestError('request canceled by beforeRequest', 'requestCanceled'));
-    }
-
     const { __headersFun__, ...realheaders } = headers;
     let newheaders = { ...realheaders };
 
@@ -265,6 +261,8 @@ export default class Request {
         newheaders = { ...newheaders, ..._newheaders };
       }
     }
+
+    fetchOpts.headers = newheaders;
 
     const contentType = newheaders['content-type'];
 
@@ -292,8 +290,12 @@ export default class Request {
     if (/^(http|https|ftp)\:\/\//.test(url)) {
       nextURL = url;
     }
+
+    if (isFunction(beforeRequest) && beforeRequest(nextURL, fetchOpts) === false) {
+      return reject(new RequestError('request canceled by beforeRequest', 'requestCanceled'));
+    }
     
-    return fetch(nextURL, { headers: newheaders, ...fetchOpts })
+    return fetch(nextURL, fetchOpts)
       .then(resp => this.__checkStatus(resp))
       .then(resp => this.__parseResponse(resp, responseType))
       .then(resp => this.__afterResponse(resp, afterResponse, {prefix, url, ...fetchOpts}))
