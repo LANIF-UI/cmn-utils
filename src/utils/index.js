@@ -70,7 +70,7 @@ export function getQueryValue(name, url) {
  * @param {any} val 
  */
 export function isArray(val) {
-  return (val != null && typeof val != 'function' && typeof val.length == 'number')
+  return Object.prototype.toString.call(val) === '[object Array]';
 }
 
 /**
