@@ -14,6 +14,7 @@ const codeMessage = {
   0: '请求错误',
   invalidURL: '无效的请求URL',
   requestCanceled: '请求被提前取消了',
+  timeout: '请求超时',
 };
 
 export default class RequestError extends Error {

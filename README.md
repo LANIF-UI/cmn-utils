@@ -61,6 +61,7 @@ $$.jsonp('abc.jsonp').then(resp => resp.json())
     prefix: '',             // request prefix
     beforeRequest: null,    // before request check, return false or a rejected Promise will stop request
     afterResponse: null,    // after request hook
+    timeout: null,          // request timeout (ms)
   }
 ```
 

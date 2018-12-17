@@ -84,6 +84,12 @@ const A = () => {
     })
   }
 
+  function timeoutRequest() {
+    $$.get("http://192.168.202.122", {}, {timeout: 400})
+      .then(resp => console.log(resp))
+      .catch(e => console.log(e));
+  }
+
   return (
     <div style={{ marginBottom: 400 }}>
       <h1>Store:</h1>
@@ -99,6 +105,7 @@ const A = () => {
       <button onClick={requestGet}>get</button>
       <button onClick={concurrencyRequest}>并发取</button>
       <button onClick={beforeRequest}>BeforeRequest</button>
+      <button onClick={timeoutRequest}>TimeoutRequest</button>
       <h1>download</h1>
       <button onClick={download}>download</button>
       <h1>JSONP</h1>

@@ -2,7 +2,13 @@ import { isFunction, isObject, param } from '../utils';
 import RequestError from './error';
 
 export const REQUEST_METHODS = [
-  'GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PUT', 'PATCH'
+  'GET',
+  'POST',
+  'HEAD',
+  'DELETE',
+  'OPTIONS',
+  'PUT',
+  'PATCH'
 ];
 
 export default class Request {
@@ -10,26 +16,27 @@ export default class Request {
    * default options
    */
   defaultOptions = {
-    method: 'POST',         // default
+    method: 'POST', // default
     mode: 'cors',
     cache: 'no-cache',
     credentials: 'include',
     headers: {
       'content-type': 'application/json'
     },
-    responseType: 'json',   // text or blob or formData https://fetch.spec.whatwg.org/
-    prefix: '',             // request prefix
-    beforeRequest: null,    // before request check, return false or a rejected Promise will stop request
-    afterResponse: null,    // after request hook
-    errorHandle: null,      // global error handle
-    withHeaders: null,      // function & object, every request will take it
-  }
+    responseType: 'json', // text or blob or formData https://fetch.spec.whatwg.org/
+    prefix: '', // request prefix
+    beforeRequest: null, // before request check, return false or a rejected Promise will stop request
+    afterResponse: null, // after request hook
+    errorHandle: null, // global error handle
+    withHeaders: null, // function & object, every request will take it
+    timeout: null // request timeout
+  };
 
   constructor(opts = {}) {
     this._options = {
       ...this.defaultOptions,
       ...opts
-    }
+    };
 
     // normalize the headers
     const headers = this._options.headers;
@@ -41,17 +48,17 @@ export default class Request {
       }
     }
 
-    REQUEST_METHODS.forEach((method) => {
+    REQUEST_METHODS.forEach(method => {
       this[method.toLowerCase()] = (url, data, options = {}) => {
         options.data = data;
         return this.send(url, { ...options, method });
-      }
-    })
+      };
+    });
   }
 
-  create = (opts) => {
+  create = opts => {
     return new Request(opts);
-  }
+  };
 
   /**
    * Set Options
@@ -77,44 +84,49 @@ export default class Request {
     }
 
     return this;
-  }
+  };
 
-  prefix = (prefix) => {
+  prefix = prefix => {
     if (prefix && typeof prefix === 'string') this._options.prefix = prefix;
     return this;
-  }
+  };
 
-  beforeRequest = (cb) => {
+  timeout = timeout => {
+    if (timeout && typeof timeout === 'number') this._options.timeout = timeout;
+    return this;
+  };
+
+  beforeRequest = cb => {
     const options = this._options;
     if (isFunction(cb)) {
       options.beforeRequest = cb;
     }
     return this;
-  }
+  };
 
-  afterResponse = (cb) => {
+  afterResponse = cb => {
     const options = this._options;
     if (isFunction(cb)) {
       options.afterResponse = cb;
     }
     return this;
-  }
+  };
 
-  errorHandle = (cb) => {
+  errorHandle = cb => {
     const options = this._options;
     if (isFunction(cb)) {
       options.errorHandle = cb;
     }
     return this;
-  }
+  };
 
-  withHeaders = (cb) => {
+  withHeaders = cb => {
     const options = this._options;
     if (isFunction(cb)) {
       options.withHeaders = cb;
     }
     return this;
-  }
+  };
 
   /**
    * Set headers
@@ -142,14 +154,14 @@ export default class Request {
     }
 
     return this;
-  }
+  };
 
   /**
    * Set Content-Type
    *
    * @param {String} type
    */
-  contentType = (type) => {
+  contentType = type => {
     const { headers } = this._options;
 
     switch (type) {
@@ -167,7 +179,7 @@ export default class Request {
 
     headers['content-type'] = type;
     return this;
-  }
+  };
 
   _data = (data, contentType) => {
     let body = null;
@@ -197,7 +209,7 @@ export default class Request {
     }
 
     return body;
-  }
+  };
 
   /**
    * GET send form
@@ -213,7 +225,7 @@ export default class Request {
         'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
       }
     });
-  }
+  };
 
   /**
    * POST send form
@@ -229,79 +241,112 @@ export default class Request {
         'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
       }
     });
-  }
+  };
 
   // send request
-  send = (url, opts = {}) => new Promise((resolve, reject) => {
-    if (typeof url !== 'string') {
-      return reject(new RequestError('invalid url', 'invalidURL'));
-    }
-
-    const { data, ...otherOpts } = opts;
-
-    const options = { ...this._options, ...otherOpts };
-
-    const { beforeRequest, afterResponse, errorHandle, responseType, prefix, headers, withHeaders, ...fetchOpts } = options;
-
-    const { __headersFun__, ...realheaders } = headers;
-    let newheaders = { ...realheaders };
-
-    if (isFunction(withHeaders)) {
-      const _newheaders = withHeaders();
-      if (_newheaders && isObject(_newheaders)) {
-        newheaders = { ...newheaders, ..._newheaders };
+  send = (url, opts = {}) =>
+    new Promise((resolve, reject) => {
+      if (typeof url !== 'string') {
+        return reject(new RequestError('invalid url', 'invalidURL'));
       }
-    } else if (isObject(withHeaders)) {
-      newheaders = { ...newheaders, ...withHeaders };
-    }
 
-    if (__headersFun__) {
-      const _newheaders = __headersFun__();
-      if (_newheaders && isObject(_newheaders)) {
-        newheaders = { ...newheaders, ..._newheaders };
+      const { data, ...otherOpts } = opts;
+
+      const options = { ...this._options, ...otherOpts };
+
+      const {
+        beforeRequest,
+        afterResponse,
+        errorHandle,
+        responseType,
+        prefix,
+        headers,
+        withHeaders,
+        timeout,
+        ...fetchOpts
+      } = options;
+
+      const { __headersFun__, ...realheaders } = headers;
+      let newheaders = { ...realheaders };
+
+      if (isFunction(withHeaders)) {
+        const _newheaders = withHeaders();
+        if (_newheaders && isObject(_newheaders)) {
+          newheaders = { ...newheaders, ..._newheaders };
+        }
+      } else if (isObject(withHeaders)) {
+        newheaders = { ...newheaders, ...withHeaders };
       }
-    }
 
-    fetchOpts.headers = newheaders;
+      if (__headersFun__) {
+        const _newheaders = __headersFun__();
+        if (_newheaders && isObject(_newheaders)) {
+          newheaders = { ...newheaders, ..._newheaders };
+        }
+      }
 
-    const contentType = newheaders['content-type'];
+      fetchOpts.headers = newheaders;
 
-    const body = this._data(data, contentType);
+      const contentType = newheaders['content-type'];
 
-    if (contentType.indexOf('application/json') !== -1) {
-      fetchOpts.body = JSON.stringify(body);
-    } else if (contentType.indexOf('application/x-www-form-urlencoded') !== -1) {
-      fetchOpts.body = param(body);
-    } else {
-      fetchOpts.body = body;
-    }
+      const body = this._data(data, contentType);
 
-    // if 'GET' request, join _body of url queryString
-    if (fetchOpts.method.toUpperCase() === 'GET' && body) {
-      if (url.indexOf('?') >= 0) {
-        url += '&' + param(body);
+      if (contentType.indexOf('application/json') !== -1) {
+        fetchOpts.body = JSON.stringify(body);
+      } else if (
+        contentType.indexOf('application/x-www-form-urlencoded') !== -1
+      ) {
+        fetchOpts.body = param(body);
       } else {
-        url += '?' + param(body);
+        fetchOpts.body = body;
       }
-      delete fetchOpts.body;
-    }
 
-    let nextURL = prefix + url;
-    if (/^(http|https|ftp)\:\/\//.test(url)) {
-      nextURL = url;
-    }
+      // if 'GET' request, join _body of url queryString
+      if (fetchOpts.method.toUpperCase() === 'GET' && body) {
+        if (url.indexOf('?') >= 0) {
+          url += '&' + param(body);
+        } else {
+          url += '?' + param(body);
+        }
+        delete fetchOpts.body;
+      }
 
-    if (isFunction(beforeRequest) && beforeRequest(nextURL, fetchOpts) === false) {
-      return reject(new RequestError('request canceled by beforeRequest', 'requestCanceled'));
-    }
-    
-    return fetch(nextURL, fetchOpts)
-      .then(resp => this.__checkStatus(resp))
-      .then(resp => this.__parseResponse(resp, responseType))
-      .then(resp => this.__afterResponse(resp, afterResponse, {prefix, url, ...fetchOpts}))
-      .then(response => resolve(response))
-      .catch(e => this.__errorHandle(e, errorHandle, reject, {prefix, url, ...fetchOpts}));
-  })
+      let nextURL = prefix + url;
+      if (/^(http|https|ftp)\:\/\//.test(url)) {
+        nextURL = url;
+      }
+
+      if (
+        isFunction(beforeRequest) &&
+        beforeRequest(nextURL, fetchOpts) === false
+      ) {
+        return reject(
+          new RequestError(
+            'request canceled by beforeRequest',
+            'requestCanceled'
+          )
+        );
+      }
+
+      return this.__timeoutFetch(nextURL, fetchOpts, options)
+        .then(resp => this.__checkStatus(resp))
+        .then(resp => this.__parseResponse(resp, responseType))
+        .then(resp =>
+          this.__afterResponse(resp, afterResponse, {
+            prefix,
+            url,
+            ...fetchOpts
+          })
+        )
+        .then(response => resolve(response))
+        .catch(e =>
+          this.__errorHandle(e, errorHandle, reject, {
+            prefix,
+            url,
+            ...fetchOpts
+          })
+        );
+    });
 
   __checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
@@ -317,7 +362,9 @@ export default class Request {
   }
 
   __parseResponse(response, responseType) {
-    return isFunction(response && response[responseType]) ? response[responseType]() : response;
+    return isFunction(response && response[responseType])
+      ? response[responseType]()
+      : response;
   }
 
   __afterResponse(response, afterResponse, info) {
@@ -336,6 +383,26 @@ export default class Request {
     }
     if (!isFunction(errorHandle) || errorHandle(e, info) !== false) {
       reject(e);
+    }
+  }
+
+  __timeoutFetch(url, fetchOpts, options) {
+    const timeout = options.timeout;
+    if (timeout && typeof timeout === 'number') {
+      return Promise.race([
+        fetch(url, fetchOpts),
+        new Promise((resolve, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                new RequestError(`request timeout of ${timeout} ms.`, 'timeout')
+              ),
+            timeout
+          )
+        )
+      ]);
+    } else {
+      return fetch(url, fetchOpts);
     }
   }
 }
