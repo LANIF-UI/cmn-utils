@@ -1904,6 +1904,14 @@ var A = function A() {
     });
   }
 
+  function timeoutRequest() {
+    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].get("http://192.168.202.122", {}, { timeout: 400 }).then(function (resp) {
+      return console.log(resp);
+    })["catch"](function (e) {
+      return console.log(e);
+    });
+  }
+
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     "div",
     { style: { marginBottom: 400 } },
@@ -1967,6 +1975,11 @@ var A = function A() {
       "button",
       { onClick: beforeRequest },
       "BeforeRequest"
+    ),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "button",
+      { onClick: timeoutRequest },
+      "TimeoutRequest"
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       "h1",
@@ -19666,6 +19679,20 @@ var Request = function () {
         reject(e);
       }
     }
+  }, {
+    key: '__timeoutFetch',
+    value: function __timeoutFetch(url, fetchOpts, options) {
+      var timeout = options.timeout;
+      if (timeout && typeof timeout === 'number') {
+        return Promise.race([fetch(url, fetchOpts), new Promise(function (resolve, reject) {
+          return setTimeout(function () {
+            return reject(new __WEBPACK_IMPORTED_MODULE_5__error__["a" /* default */]('request timeout of ' + timeout + ' ms.', 'timeout'));
+          }, timeout);
+        })]);
+      } else {
+        return fetch(url, fetchOpts);
+      }
+    }
   }]);
 
   return Request;
@@ -19687,7 +19714,8 @@ var _initialiseProps = function _initialiseProps() {
     beforeRequest: null, // before request check, return false or a rejected Promise will stop request
     afterResponse: null, // after request hook
     errorHandle: null, // global error handle
-    withHeaders: null // function & object, every request will take it
+    withHeaders: null, // function & object, every request will take it
+    timeout: null // request timeout
   };
 
   this.create = function (opts) {
@@ -19710,6 +19738,11 @@ var _initialiseProps = function _initialiseProps() {
 
   this.prefix = function (prefix) {
     if (prefix && typeof prefix === 'string') _this2._options.prefix = prefix;
+    return _this2;
+  };
+
+  this.timeout = function (timeout) {
+    if (timeout && typeof timeout === 'number') _this2._options.timeout = timeout;
     return _this2;
   };
 
@@ -19856,7 +19889,8 @@ var _initialiseProps = function _initialiseProps() {
           prefix = options.prefix,
           headers = options.headers,
           withHeaders = options.withHeaders,
-          fetchOpts = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_objectWithoutProperties___default()(options, ['beforeRequest', 'afterResponse', 'errorHandle', 'responseType', 'prefix', 'headers', 'withHeaders']);
+          timeout = options.timeout,
+          fetchOpts = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_objectWithoutProperties___default()(options, ['beforeRequest', 'afterResponse', 'errorHandle', 'responseType', 'prefix', 'headers', 'withHeaders', 'timeout']);
 
       var __headersFun__ = headers.__headersFun__,
           realheaders = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_objectWithoutProperties___default()(headers, ['__headersFun__']);
@@ -19912,16 +19946,22 @@ var _initialiseProps = function _initialiseProps() {
         return reject(new __WEBPACK_IMPORTED_MODULE_5__error__["a" /* default */]('request canceled by beforeRequest', 'requestCanceled'));
       }
 
-      return fetch(nextURL, fetchOpts).then(function (resp) {
+      return _this2.__timeoutFetch(nextURL, fetchOpts, options).then(function (resp) {
         return _this2.__checkStatus(resp);
       }).then(function (resp) {
         return _this2.__parseResponse(resp, responseType);
       }).then(function (resp) {
-        return _this2.__afterResponse(resp, afterResponse, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({ prefix: prefix, url: url }, fetchOpts));
+        return _this2.__afterResponse(resp, afterResponse, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({
+          prefix: prefix,
+          url: url
+        }, fetchOpts));
       }).then(function (response) {
         return resolve(response);
       })['catch'](function (e) {
-        return _this2.__errorHandle(e, errorHandle, reject, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({ prefix: prefix, url: url }, fetchOpts));
+        return _this2.__errorHandle(e, errorHandle, reject, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({
+          prefix: prefix,
+          url: url
+        }, fetchOpts));
       });
     });
   };
@@ -20038,7 +20078,8 @@ var codeMessage = {
   504: '网关超时',
   0: '请求错误',
   invalidURL: '无效的请求URL',
-  requestCanceled: '请求被提前取消了'
+  requestCanceled: '请求被提前取消了',
+  timeout: '请求超时'
 };
 
 var RequestError = function (_Error) {
