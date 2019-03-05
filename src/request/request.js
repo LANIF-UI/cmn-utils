@@ -181,36 +181,6 @@ export default class Request {
     return this;
   };
 
-  _data = (data, contentType) => {
-    let body = null;
-
-    // if FormData
-    if (contentType.indexOf('multipart/form-data') !== -1) {
-      body = new FormData();
-
-      if (data instanceof FormData) {
-        body = data;
-        return body;
-      }
-
-      if (typeof data === 'object') {
-        for (const k in data) {
-          body.append(k, data[k]);
-        }
-      }
-    } else {
-      if (body && typeof data === 'object') {
-        for (const key in data) {
-          body[key] = data[key];
-        }
-      } else {
-        body = data;
-      }
-    }
-
-    return body;
-  };
-
   /**
    * GET send form
    */
@@ -266,6 +236,9 @@ export default class Request {
         ...fetchOpts
       } = options;
 
+      /*******************
+       * format header
+       *******************/
       const { __headersFun__, ...realheaders } = headers;
       let newheaders = { ...realheaders };
 
@@ -287,30 +260,52 @@ export default class Request {
 
       fetchOpts.headers = newheaders;
 
+      /***********************
+       * format data to body
+       ***********************/
       const contentType = newheaders['content-type'];
-
-      const body = this._data(data, contentType);
-
-      if (contentType.indexOf('application/json') !== -1) {
-        fetchOpts.body = JSON.stringify(body);
-      } else if (
+      fetchOpts.body = data;
+      // if FormData
+      if (
+        contentType.indexOf('multipart/form-data') !== -1 ||
+        data instanceof FormData
+      ) {
+        if (data instanceof FormData) {
+          fetchOpts.body = data;
+        } else if (isObject(data)) {
+          fetchOpts.body = new FormData();
+          for (const k in data) {
+            fetchOpts.body.append(k, data[k]);
+          }
+        }
+        // If it is FormData, content-type: 'multipart/form-data' is deleted,
+        // otherwise the boundary will not be added automatically
+        delete fetchOpts.headers['content-type'];
+      }
+      // if json
+      else if (contentType.indexOf('application/json') !== -1) {
+        fetchOpts.body = JSON.stringify(fetchOpts.body);
+      }
+      // if form
+      else if (
         contentType.indexOf('application/x-www-form-urlencoded') !== -1
       ) {
-        fetchOpts.body = param(body);
-      } else {
-        fetchOpts.body = body;
+        fetchOpts.body = param(fetchOpts.body);
       }
 
       // if 'GET' request, join _body of url queryString
-      if (fetchOpts.method.toUpperCase() === 'GET' && body) {
+      if (fetchOpts.method.toUpperCase() === 'GET' && data) {
         if (url.indexOf('?') >= 0) {
-          url += '&' + param(body);
+          url += '&' + param(data);
         } else {
-          url += '?' + param(body);
+          url += '?' + param(data);
         }
         delete fetchOpts.body;
       }
 
+      /*******************
+       * format url
+       *******************/
       let nextURL = prefix + url;
       if (/^(http|https|ftp)\:\/\//.test(url)) {
         nextURL = url;

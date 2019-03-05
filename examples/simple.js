@@ -61,7 +61,7 @@ const A = () => {
   }
 
   function beforeRequest() {
-    $$.get("http://httpbin.org/get", {}, {
+    $$.get("http://httpbin.org/get", {a: 123}, {
       beforeRequest: (url, options) => {
         console.log(url, options);
         // return false; // return false cancel request
@@ -85,9 +85,17 @@ const A = () => {
   }
 
   function timeoutRequest() {
-    $$.get("http://192.168.202.122", {}, {timeout: 400})
+    $$.get("http://192.168.202.122", {a: 123}, {timeout: 400})
       .then(resp => console.log(resp))
       .catch(e => console.log(e));
+  }
+
+  function onUpload() {
+    const data = new FormData();
+    data.append('file', document.querySelector('#avatar').files[0]);
+    data.append('user', 'weiq');
+
+    $$.get('http://httpbin.org/get', data).catch(e => console.error('upload error!', e));
   }
 
   return (
@@ -110,6 +118,9 @@ const A = () => {
       <button onClick={download}>download</button>
       <h1>JSONP</h1>
       <button onClick={jsonp}>JSONP</button>
+      <h1>Upload FormData</h1>
+      <input type="file" id="avatar" name="avatar" />
+      <button onClick={onUpload}>Upload</button>
     </div>
   );
 };

@@ -116,6 +116,21 @@ $$.getform('/form', {name: 'weiq'}) // 将拼接到url后面
   })
 ```
 
+#### 使用FormData && 上传 
+```html
+<h1>Upload FormData</h1>
+<input type="file" id="avatar" name="avatar" />
+```
+注：不能用get方法
+```js
+const data = new FormData();
+data.append('file', document.querySelector('#avatar').files[0]);
+data.append('user', 'weiq');
+
+$$.post('http://httpbin.org/post', data)
+  .catch(e => console.error('upload error!', e));
+```
+
 #### 全局配置, 将会覆盖默认参数, 一般全局配置一次
 
 ```js
