@@ -1882,7 +1882,7 @@ var A = function A() {
   }
 
   function beforeRequest() {
-    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].get("http://httpbin.org/get", {}, {
+    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].get("http://httpbin.org/get", { a: 123 }, {
       beforeRequest: function beforeRequest(url, options) {
         console.log(url, options);
         // return false; // return false cancel request
@@ -1905,10 +1905,20 @@ var A = function A() {
   }
 
   function timeoutRequest() {
-    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].get("http://192.168.202.122", {}, { timeout: 400 }).then(function (resp) {
+    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].get("http://192.168.202.122", { a: 123 }, { timeout: 400 }).then(function (resp) {
       return console.log(resp);
     })["catch"](function (e) {
       return console.log(e);
+    });
+  }
+
+  function onUpload() {
+    var data = new FormData();
+    data.append('file', document.querySelector('#avatar').files[0]);
+    data.append('user', 'weiq');
+
+    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].get('http://httpbin.org/get', data)["catch"](function (e) {
+      return console.error('upload error!', e);
     });
   }
 
@@ -2000,6 +2010,17 @@ var A = function A() {
       "button",
       { onClick: jsonp },
       "JSONP"
+    ),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "h1",
+      null,
+      "Upload FormData"
+    ),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("input", { type: "file", id: "avatar", name: "avatar" }),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "button",
+      { onClick: onUpload },
+      "Upload"
     )
   );
 };
@@ -19816,36 +19837,6 @@ var _initialiseProps = function _initialiseProps() {
     return _this2;
   };
 
-  this._data = function (data, contentType) {
-    var body = null;
-
-    // if FormData
-    if (contentType.indexOf('multipart/form-data') !== -1) {
-      body = new FormData();
-
-      if (data instanceof FormData) {
-        body = data;
-        return body;
-      }
-
-      if (typeof data === 'object') {
-        for (var k in data) {
-          body.append(k, data[k]);
-        }
-      }
-    } else {
-      if (body && typeof data === 'object') {
-        for (var key in data) {
-          body[key] = data[key];
-        }
-      } else {
-        body = data;
-      }
-    }
-
-    return body;
-  };
-
   this.getform = function (url, data) {
     var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
@@ -19892,6 +19883,11 @@ var _initialiseProps = function _initialiseProps() {
           timeout = options.timeout,
           fetchOpts = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_objectWithoutProperties___default()(options, ['beforeRequest', 'afterResponse', 'errorHandle', 'responseType', 'prefix', 'headers', 'withHeaders', 'timeout']);
 
+      /*******************
+       * format header
+       *******************/
+
+
       var __headersFun__ = headers.__headersFun__,
           realheaders = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_objectWithoutProperties___default()(headers, ['__headersFun__']);
 
@@ -19915,28 +19911,47 @@ var _initialiseProps = function _initialiseProps() {
 
       fetchOpts.headers = newheaders;
 
+      /***********************
+       * format data to body
+       ***********************/
       var contentType = newheaders['content-type'];
-
-      var body = _this2._data(data, contentType);
-
-      if (contentType.indexOf('application/json') !== -1) {
-        fetchOpts.body = JSON.stringify(body);
-      } else if (contentType.indexOf('application/x-www-form-urlencoded') !== -1) {
-        fetchOpts.body = Object(__WEBPACK_IMPORTED_MODULE_4__utils__["param"])(body);
-      } else {
-        fetchOpts.body = body;
+      fetchOpts.body = data;
+      // if FormData
+      if (contentType.indexOf('multipart/form-data') !== -1 || data instanceof FormData) {
+        if (data instanceof FormData) {
+          fetchOpts.body = data;
+        } else if (Object(__WEBPACK_IMPORTED_MODULE_4__utils__["isObject"])(data)) {
+          fetchOpts.body = new FormData();
+          for (var k in data) {
+            fetchOpts.body.append(k, data[k]);
+          }
+        }
+        // If it is FormData, content-type: 'multipart/form-data' is deleted,
+        // otherwise the boundary will not be added automatically
+        delete fetchOpts.headers['content-type'];
       }
+      // if json
+      else if (contentType.indexOf('application/json') !== -1) {
+          fetchOpts.body = JSON.stringify(fetchOpts.body);
+        }
+        // if form
+        else if (contentType.indexOf('application/x-www-form-urlencoded') !== -1) {
+            fetchOpts.body = Object(__WEBPACK_IMPORTED_MODULE_4__utils__["param"])(fetchOpts.body);
+          }
 
       // if 'GET' request, join _body of url queryString
-      if (fetchOpts.method.toUpperCase() === 'GET' && body) {
+      if (fetchOpts.method.toUpperCase() === 'GET' && data) {
         if (url.indexOf('?') >= 0) {
-          url += '&' + Object(__WEBPACK_IMPORTED_MODULE_4__utils__["param"])(body);
+          url += '&' + Object(__WEBPACK_IMPORTED_MODULE_4__utils__["param"])(data);
         } else {
-          url += '?' + Object(__WEBPACK_IMPORTED_MODULE_4__utils__["param"])(body);
+          url += '?' + Object(__WEBPACK_IMPORTED_MODULE_4__utils__["param"])(data);
         }
         delete fetchOpts.body;
       }
 
+      /*******************
+       * format url
+       *******************/
       var nextURL = prefix + url;
       if (/^(http|https|ftp)\:\/\//.test(url)) {
         nextURL = url;

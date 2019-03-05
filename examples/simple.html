@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>simple.js - example - cmn-utils@1.0.8</title>
+  <title>simple.js - example - cmn-utils@1.0.9</title>
   <meta name="viewport"
         content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <meta charset="utf-8"/>
@@ -263,7 +263,7 @@ Monokai Sublime style. Derived from Monokai by noformnocontent http://nn.mit-lic
 <body>
   <div class="container">
     <div class="header">
-      <h1>cmn-utils@1.0.8</h1>
+      <h1>cmn-utils@1.0.9</h1>
 
       <p>common func &amp; req</p>
     </div>
@@ -332,7 +332,7 @@ request
   }
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">beforeRequest</span>(<span class="hljs-params"></span>) </span>{
-    $$.get(<span class="hljs-string">"http://httpbin.org/get"</span>, {}, {
+    $$.get(<span class="hljs-string">"http://httpbin.org/get"</span>, {a: <span class="hljs-number">123</span>}, {
       beforeRequest: (url, options) =&gt; {
         <span class="hljs-built_in">console</span>.log(url, options);
         <span class="hljs-comment">// return false; // return false cancel request</span>
@@ -356,9 +356,17 @@ request
   }
 
   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">timeoutRequest</span>(<span class="hljs-params"></span>) </span>{
-    $$.get(<span class="hljs-string">"http://192.168.202.122"</span>, {}, {timeout: <span class="hljs-number">400</span>})
+    $$.get(<span class="hljs-string">"http://192.168.202.122"</span>, {a: <span class="hljs-number">123</span>}, {timeout: <span class="hljs-number">400</span>})
       .then(resp =&gt; <span class="hljs-built_in">console</span>.log(resp))
       .catch(e =&gt; <span class="hljs-built_in">console</span>.log(e));
+  }
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onUpload</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">new</span> FormData();
+    data.append(<span class="hljs-string">'file'</span>, <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">'#avatar'</span>).files[<span class="hljs-number">0</span>]);
+    data.append(<span class="hljs-string">'user'</span>, <span class="hljs-string">'weiq'</span>);
+
+    $$.get(<span class="hljs-string">'http://httpbin.org/get'</span>, data).catch(e =&gt; <span class="hljs-built_in">console</span>.error(<span class="hljs-string">'upload error!'</span>, e));
   }
 
   <span class="hljs-keyword">return</span> (
@@ -381,6 +389,9 @@ request
       <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{download}</span>&gt;</span>download<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">h1</span>&gt;</span>JSONP<span class="hljs-tag">&lt;/<span class="hljs-title">h1</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{jsonp}</span>&gt;</span>JSONP<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">h1</span>&gt;</span>Upload FormData<span class="hljs-tag">&lt;/<span class="hljs-title">h1</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">input</span> <span class="hljs-attribute">type</span>=<span class="hljs-value">"file"</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"avatar"</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"avatar"</span> /&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">onClick</span>=<span class="hljs-value">{onUpload}</span>&gt;</span>Upload<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
   )</span>;
 };
