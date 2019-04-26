@@ -249,29 +249,31 @@ $$.once('eventName', function(value) {
 
 # Download
 
-下载文件 `download(data, strFileName, strMimeType);`
+下载文件 `$$.download(data, strFileName, strMimeType);`
 
 #### 示例
 ```javascript
-download("hello world", "dlText.txt", "text/plain");
+$$.download("hello world", "dlText.txt", "text/plain");
 
-download("data:text/plain,hello%20world", "dlDataUrlText.txt", "text/plain");
+$$.download("data:text/plain,hello%20world", "dlDataUrlText.txt", "text/plain");
 
-download(new Blob(["hello world"]), "dlTextBlob.txt", "text/plain");
+$$.download(new Blob(["hello world"]), "dlTextBlob.txt", "text/plain");
 
-download("/robots.txt");
+$$.download("/robots.txt");
 
 var str= "hello world",	arr= new Uint8Array(str.length);
 str.split("").forEach(function(a,b){
   arr[b]=a.charCodeAt();
 });
-download( arr, "textUInt8Array.txt", "text/plain" );
+$$.download( arr, "textUInt8Array.txt", "text/plain" );
 
-download("/diff6.png");
+$$.download("/diff6.png");
 
 var x=new XMLHttpRequest();
 x.open( "GET", "/diff6.png" , true);
 x.responseType="blob";
-x.onload= function(e){download(e.target.response, "awesomesauce.png", "image/png");};
+x.onload= function(e){
+  $$.download(e.target.response, "awesomesauce.png", "image/png");
+};
 x.send();
 ```
