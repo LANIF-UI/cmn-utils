@@ -157,11 +157,26 @@ $$.post('http://httpbin.org/post', {name: 'weiq'}, {
     headers: {
       'content-type': 'application/json'
     },
-    responseType: 'json',
+    responseType: 'json', // 转成json
   })
   .then(resp => {
     console.log(resp.json) // {name: 'weiq'}
   })
+```
+
+#### 获取原始响应结果 & 单独处理响应
+
+当返回值不是统一格式时，使用`afterResponse: null`,可以不走全局的拦截器，或者想取原始响应结果时使用`responseType: null`
+
+```js
+$$.get("http://httpbin.org/get", {}, {
+  responseType: null,  // 不处理返回结果
+  afterResponse: null  // 不走公共 afterResponse
+})
+  .then(function(resp) {
+    console.log(resp)
+  })
+  .catch(e => console.log(e));
 ```
 
 #### 并发请求
