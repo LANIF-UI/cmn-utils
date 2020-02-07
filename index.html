@@ -7,7 +7,7 @@
   <meta charset="utf-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css" rel="stylesheet"/>
-  <title>cmn-utils@1.0.9 - common func &amp; req</title>
+  <title>cmn-utils@1.0.10 - common func &amp; req</title>
   <style>
     @font-face {
       font-family: octicons-anchor;
@@ -737,7 +737,7 @@
 
 <body>
 <div class="header">
-  <h1>cmn-utils@1.0.9</h1>
+  <h1>cmn-utils@1.0.10</h1>
 </div>
 <div class="examples">
   <h3>EXAMPLES</h3>
@@ -862,11 +862,19 @@ $$.requestHeaders(_ =&gt; ({
     headers: {
       <span class="hljs-string">'content-type'</span>: <span class="hljs-string">'application/json'</span>
     },
-    responseType: <span class="hljs-string">'json'</span>,
+    responseType: <span class="hljs-string">'json'</span>, <span class="hljs-comment">// 转成json</span>
   })
   .then(resp =&gt; {
     <span class="hljs-built_in">console</span>.log(resp.json) <span class="hljs-comment">// {name: 'weiq'}</span>
-  })</code></pre></div><h4>并发请求<a id="user-content-并发请求" name="并发请求" class="anchor" aria-hidden="true" href="#并发请求"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">concurrencyRequest</span>(<span class="hljs-params"></span>) </span>{
+  })</code></pre></div><h4>获取原始响应结果 &amp; 单独处理响应<a id="user-content-获取原始响应结果-&amp;-单独处理响应" name="获取原始响应结果-&amp;-单独处理响应" class="anchor" aria-hidden="true" href="#获取原始响应结果-&amp;-单独处理响应"><span class="octicon octicon-link"></span></a></h4><p>当返回值不是统一格式时，使用<code>afterResponse: null</code>,可以不走全局的拦截器，或者想取原始响应结果时使用<code>responseType: null</code></p>
+<div class="highlight"><pre><code language="js">$$.get(<span class="hljs-string">"http://httpbin.org/get"</span>, {}, {
+  responseType: <span class="hljs-literal">null</span>,  <span class="hljs-comment">// 不处理返回结果</span>
+  afterResponse: <span class="hljs-literal">null</span>  <span class="hljs-comment">// 不走公共 afterResponse</span>
+})
+  .then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resp</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(resp)
+  })
+  .catch(e =&gt; <span class="hljs-built_in">console</span>.log(e));</code></pre></div><h4>并发请求<a id="user-content-并发请求" name="并发请求" class="anchor" aria-hidden="true" href="#并发请求"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">concurrencyRequest</span>(<span class="hljs-params"></span>) </span>{
   <span class="hljs-keyword">let</span> r1 = $$.get(<span class="hljs-string">"http://httpbin.org/get"</span>);
   <span class="hljs-keyword">let</span> r2 = $$.post(<span class="hljs-string">"http://httpbin.org/post"</span>);
   <span class="hljs-keyword">let</span> r3 = $$.put(<span class="hljs-string">"http://httpbin.org/put"</span>);
@@ -926,27 +934,29 @@ $$.off(<span class="hljs-string">'eventName'</span>);
 
 $$.once(<span class="hljs-string">'eventName'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
   <span class="hljs-built_in">console</span>.log(value)
-});</code></pre></div><h1>Download<a id="user-content-download" name="download" class="anchor" aria-hidden="true" href="#download"><span class="octicon octicon-link"></span></a></h1><p>下载文件 <code>download(data, strFileName, strMimeType);</code></p>
-<h4>示例<a id="user-content-示例" name="示例" class="anchor" aria-hidden="true" href="#示例"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="javascript">download(<span class="hljs-string">"hello world"</span>, <span class="hljs-string">"dlText.txt"</span>, <span class="hljs-string">"text/plain"</span>);
+});</code></pre></div><h1>Download<a id="user-content-download" name="download" class="anchor" aria-hidden="true" href="#download"><span class="octicon octicon-link"></span></a></h1><p>下载文件 <code>$$.download(data, strFileName, strMimeType);</code></p>
+<h4>示例<a id="user-content-示例" name="示例" class="anchor" aria-hidden="true" href="#示例"><span class="octicon octicon-link"></span></a></h4><div class="highlight"><pre><code language="javascript">$$.download(<span class="hljs-string">"hello world"</span>, <span class="hljs-string">"dlText.txt"</span>, <span class="hljs-string">"text/plain"</span>);
 
-download(<span class="hljs-string">"data:text/plain,hello%20world"</span>, <span class="hljs-string">"dlDataUrlText.txt"</span>, <span class="hljs-string">"text/plain"</span>);
+$$.download(<span class="hljs-string">"data:text/plain,hello%20world"</span>, <span class="hljs-string">"dlDataUrlText.txt"</span>, <span class="hljs-string">"text/plain"</span>);
 
-download(<span class="hljs-keyword">new</span> Blob([<span class="hljs-string">"hello world"</span>]), <span class="hljs-string">"dlTextBlob.txt"</span>, <span class="hljs-string">"text/plain"</span>);
+$$.download(<span class="hljs-keyword">new</span> Blob([<span class="hljs-string">"hello world"</span>]), <span class="hljs-string">"dlTextBlob.txt"</span>, <span class="hljs-string">"text/plain"</span>);
 
-download(<span class="hljs-string">"/robots.txt"</span>);
+$$.download(<span class="hljs-string">"/robots.txt"</span>);
 
 <span class="hljs-keyword">var</span> str= <span class="hljs-string">"hello world"</span>,    arr= <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>(str.length);
 str.split(<span class="hljs-string">""</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">a,b</span>)</span>{
   arr[b]=a.charCodeAt();
 });
-download( arr, <span class="hljs-string">"textUInt8Array.txt"</span>, <span class="hljs-string">"text/plain"</span> );
+$$.download( arr, <span class="hljs-string">"textUInt8Array.txt"</span>, <span class="hljs-string">"text/plain"</span> );
 
-download(<span class="hljs-string">"/diff6.png"</span>);
+$$.download(<span class="hljs-string">"/diff6.png"</span>);
 
 <span class="hljs-keyword">var</span> x=<span class="hljs-keyword">new</span> XMLHttpRequest();
 x.open( <span class="hljs-string">"GET"</span>, <span class="hljs-string">"/diff6.png"</span> , <span class="hljs-literal">true</span>);
 x.responseType=<span class="hljs-string">"blob"</span>;
-x.onload= <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{download(e.target.response, <span class="hljs-string">"awesomesauce.png"</span>, <span class="hljs-string">"image/png"</span>);};
+x.onload= <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{
+  $$.download(e.target.response, <span class="hljs-string">"awesomesauce.png"</span>, <span class="hljs-string">"image/png"</span>);
+};
 x.send();</code></pre></div>
   </div>
 </div>

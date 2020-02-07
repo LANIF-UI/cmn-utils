@@ -1894,6 +1894,23 @@ var A = function A() {
     });
   }
 
+  function customParseResponse() {
+    __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].post("http://httpbin.org/post", { a: 123 }, {
+      parseResponse: function parseResponse(response, responseType) {
+        // 可以获取响应头，如果头内容不全或为空，可能需要查看后端与nginx的配置
+        response.headers.forEach(function (v, k) {
+          console.log(k + ":" + v);
+        });
+        // 需要返回响应内容
+        return response.json();
+      }
+    }).then(function (resp) {
+      return console.log(resp);
+    })["catch"](function (e) {
+      return console.log(e);
+    });
+  }
+
   function download() {
     __WEBPACK_IMPORTED_MODULE_2__src_index__["a" /* default */].download("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAARASURBVHjaYvz//z8DMcC25rYAkPIFYhcg1gRiOSBmg0r/AuKHQHwdiPcA8ebDLaofiTEXIIAYCTkAaLE2kCoH4lAg5kCT/galudDEfwDxKiDuADrkOj7zAQIIpwOAFvMAqTYgzgJiZiD+DcQHQb4D4sNA/Bho+BuoWhEgJQvEdtBQAtGsQPwHiKcCcSVQ7Xds9gAEEFYHAA1UB1LroUENCt4ZQNwKNOQVkdElDqRqgDgNGk2ngdgfqP85ulqAAMJwAFCzPpDaBcRiQHwSiCOAGh8wkAGAZikBqRVAbAoKMSD2App1BVkNQAChOACoQQVIHQFikA+WAXEyUMMPBgoA0ExOIDUP5BGoI8yAZr6AyQMEENwBQIVcUB/rAPFyII4GKvzPQAUANJsRamY4EJ8AYkeYxwACiAlJXQvUcpAjkqhlOQhAzUoE4jNAbAHE1TA5gAAChwA00YHi5i8o4QE13GegAYBG8VVojlIFJUqAAIKFQBkQswDxdHItBxrOC8RMBELiDpCaBcTcQFwLEgMIIEab6lt8QPo5NK/LwPI2muGqQOotUO4dFjl5ILUSiM2B+D0QN0Ppp0D1u7GoF4MmRlAoSAAEEMjFPtCSbB82y6EgGIgPADXLYJFbA7UcBASBuA+Ip0ELJmyhACpLDkBDwQsggEAOcILKbcJXYgKxLhCfBToiGJqqYSFjgkX9PyC+hMe8jVDaCSCAQA7Qg3KO4NGwHloiikF9fBdo+URotsIGdgJ9egaPeTC79AECCJTwFKGcZ3g0gBz5CIhVoHyQnjw86u8QSLMwu5QAAggUAnzQ2us9Hg1vkSwnBpwjIA8y7yfIboAAYoLG7398BQ9Qbi+QagepI8JyUOreTYQ6kFmMAAEEcgCo4cAJjFNBAhpAjnhBhMGLsGVXNCAEbVt8BAggkANgBY80AU0nCaRsBqgDq4hwJMyuewABxIRkqA2BUuwLEHsAmYU4ouIrEAcR2WaA2XURIIBAuWAfqNoFYj9owwNbTWYFze+OQOwNTTfIAFSyhQAtP0VkIvWH0vsAAggUAlugbTsnaNMKW012HVrKKSD5/ge0aZYNxOrEWg4tih2gIbYNIIBgteFcUBUMxBOABhUy0BAA7ZoMpHKAeDbQrjSAAILVXl3QBmQmUIEiDS1XgbYTQaVqJ0gMIICYoMF8E0iBXMYOarkAFXLQwHJOaKuIDRrSd0HiAAGEXH9XQ1uvoJptHqzCoWKTbD40IYOaZPUwOYAAQm+UCkPzuzIQbwXiKKBLP1FoOR/U517QOsICaOZbmDxAADGhpXiQRAC04gFlt11AAxQosFwJ2lXzgnbdApAtBwGAAMLVMYFVu7ZU6pgcgpYTr9HVAgQQvq4ZG7StCOoX8pDZNQOVFR2gLh5Q7W9s9gAEEDGdU0loOy+axM4pKN4bgRY/xGc+QAAxUtg9h5Wcb8jtngMEGABphoApdIiovgAAAABJRU5ErkJggg==", "aaa");
   }
@@ -1990,6 +2007,11 @@ var A = function A() {
       "button",
       { onClick: timeoutRequest },
       "TimeoutRequest"
+    ),
+    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      "button",
+      { onClick: customParseResponse },
+      "CustomParseResponse"
     ),
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       "h1",
@@ -19676,7 +19698,12 @@ var Request = function () {
     }
   }, {
     key: '__parseResponse',
-    value: function __parseResponse(response, responseType) {
+    value: function __parseResponse(response, responseType, parseResponse) {
+      if (Object(__WEBPACK_IMPORTED_MODULE_4__utils__["isFunction"])(parseResponse)) {
+        var after = parseResponse(response, responseType);
+        return after;
+      }
+
       return Object(__WEBPACK_IMPORTED_MODULE_4__utils__["isFunction"])(response && response[responseType]) ? response[responseType]() : response;
     }
   }, {
@@ -19733,6 +19760,7 @@ var _initialiseProps = function _initialiseProps() {
     responseType: 'json', // text or blob or formData https://fetch.spec.whatwg.org/
     prefix: '', // request prefix
     beforeRequest: null, // before request check, return false or a rejected Promise will stop request
+    parseResponse: null, // custom parse function, need return response of processing
     afterResponse: null, // after request hook
     errorHandle: null, // global error handle
     withHeaders: null, // function & object, every request will take it
@@ -19795,6 +19823,14 @@ var _initialiseProps = function _initialiseProps() {
     var options = _this2._options;
     if (Object(__WEBPACK_IMPORTED_MODULE_4__utils__["isFunction"])(cb)) {
       options.withHeaders = cb;
+    }
+    return _this2;
+  };
+
+  this.parseResponse = function (cb) {
+    var options = _this2._options;
+    if (Object(__WEBPACK_IMPORTED_MODULE_4__utils__["isFunction"])(cb)) {
+      options.parseResponse = cb;
     }
     return _this2;
   };
@@ -19874,6 +19910,7 @@ var _initialiseProps = function _initialiseProps() {
       var options = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({}, _this2._options, otherOpts);
 
       var beforeRequest = options.beforeRequest,
+          parseResponse = options.parseResponse,
           afterResponse = options.afterResponse,
           errorHandle = options.errorHandle,
           responseType = options.responseType,
@@ -19881,7 +19918,7 @@ var _initialiseProps = function _initialiseProps() {
           headers = options.headers,
           withHeaders = options.withHeaders,
           timeout = options.timeout,
-          fetchOpts = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_objectWithoutProperties___default()(options, ['beforeRequest', 'afterResponse', 'errorHandle', 'responseType', 'prefix', 'headers', 'withHeaders', 'timeout']);
+          fetchOpts = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_helpers_objectWithoutProperties___default()(options, ['beforeRequest', 'parseResponse', 'afterResponse', 'errorHandle', 'responseType', 'prefix', 'headers', 'withHeaders', 'timeout']);
 
       /*******************
        * format header
@@ -19964,19 +20001,13 @@ var _initialiseProps = function _initialiseProps() {
       return _this2.__timeoutFetch(nextURL, fetchOpts, options).then(function (resp) {
         return _this2.__checkStatus(resp);
       }).then(function (resp) {
-        return _this2.__parseResponse(resp, responseType);
+        return _this2.__parseResponse(resp, responseType, parseResponse);
       }).then(function (resp) {
-        return _this2.__afterResponse(resp, afterResponse, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({
-          prefix: prefix,
-          url: url
-        }, fetchOpts));
-      }).then(function (response) {
-        return resolve(response);
+        return _this2.__afterResponse(resp, afterResponse, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({ prefix: prefix, url: url }, fetchOpts));
+      }).then(function (resp) {
+        return resolve(resp);
       })['catch'](function (e) {
-        return _this2.__errorHandle(e, errorHandle, reject, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({
-          prefix: prefix,
-          url: url
-        }, fetchOpts));
+        return _this2.__errorHandle(e, errorHandle, reject, __WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_extends___default()({ prefix: prefix, url: url }, fetchOpts));
       });
     });
   };
