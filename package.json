@@ -1,6 +1,6 @@
 {
   "name": "cmn-utils",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "common func & req",
   "keywords": [
     "react",
@@ -40,7 +40,7 @@
   "devDependencies": {
     "jest": "^22.0.3",
     "pre-commit": "1.x",
-    "rc-tools": "^8.4.2",
+    "rc-tools": "^9.5.3",
     "react": "^16.2.0",
     "react-dom": "^16.2.0"
   },

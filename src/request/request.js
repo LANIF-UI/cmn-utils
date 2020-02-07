@@ -26,6 +26,7 @@ export default class Request {
     responseType: 'json', // text or blob or formData https://fetch.spec.whatwg.org/
     prefix: '', // request prefix
     beforeRequest: null, // before request check, return false or a rejected Promise will stop request
+    parseResponse: null, // custom parse function, need return response of processing
     afterResponse: null, // after request hook
     errorHandle: null, // global error handle
     withHeaders: null, // function & object, every request will take it
@@ -128,6 +129,14 @@ export default class Request {
     return this;
   };
 
+  parseResponse = cb => {
+    const options = this._options;
+    if (isFunction(cb)) {
+      options.parseResponse = cb;
+    }
+    return this;
+  };
+
   /**
    * Set headers
    *
@@ -226,6 +235,7 @@ export default class Request {
 
       const {
         beforeRequest,
+        parseResponse,
         afterResponse,
         errorHandle,
         responseType,
@@ -325,22 +335,10 @@ export default class Request {
 
       return this.__timeoutFetch(nextURL, fetchOpts, options)
         .then(resp => this.__checkStatus(resp))
-        .then(resp => this.__parseResponse(resp, responseType))
-        .then(resp =>
-          this.__afterResponse(resp, afterResponse, {
-            prefix,
-            url,
-            ...fetchOpts
-          })
-        )
-        .then(response => resolve(response))
-        .catch(e =>
-          this.__errorHandle(e, errorHandle, reject, {
-            prefix,
-            url,
-            ...fetchOpts
-          })
-        );
+        .then(resp => this.__parseResponse(resp, responseType, parseResponse))
+        .then(resp => this.__afterResponse(resp, afterResponse, { prefix, url, ...fetchOpts }))
+        .then(resp => resolve(resp))
+        .catch(e => this.__errorHandle(e, errorHandle, reject, { prefix, url, ...fetchOpts }));
     });
 
   __checkStatus(response) {
@@ -356,7 +354,12 @@ export default class Request {
     throw error;
   }
 
-  __parseResponse(response, responseType) {
+  __parseResponse(response, responseType, parseResponse) {
+    if (isFunction(parseResponse)) {
+      const after = parseResponse(response, responseType);
+      return after;
+    }
+
     return isFunction(response && response[responseType])
       ? response[responseType]()
       : response;
